@@ -8,7 +8,7 @@
 
   <include file="$(find rosbot_gazebo)/launch/rosbot_world.launch">
     <arg name="gui" value="$(arg gui)"/>
-    <arg name="world" value="$(arg world)"/>
+    <arg name="world" value="$(find rosbot_gazebo)/worlds/aruco_assignment.world"/>
   </include>
 
 </launch>
