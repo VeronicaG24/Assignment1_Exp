@@ -264,10 +264,12 @@
 
   <!-- Orbbec Astra RGBD Camera -->
   <joint name="astra_joint" type="continuous">
-    <axis xyz="0 0 0" />
+    <axis xyz="0 0 1" />
     <origin xyz="-0.03 0 0.18" rpy="0 0 0"/>
     <parent link="body_link"/>
     <child link="camera_link"/>
+    <limit effort="1" velocity="10"/>
+    <joint_properties damping="5.0" friction="1.0"/>
   </joint>
 
   <link name="camera_link">
