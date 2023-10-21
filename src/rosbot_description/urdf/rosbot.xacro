@@ -263,7 +263,7 @@
   </transmission>
 
   <!-- Orbbec Astra RGBD Camera -->
-  <joint name="astra_joint" type="fixed">
+  <joint name="astra_joint" type="continuous">
     <axis xyz="0 0 0" />
     <origin xyz="-0.03 0 0.18" rpy="0 0 0"/>
     <parent link="body_link"/>
