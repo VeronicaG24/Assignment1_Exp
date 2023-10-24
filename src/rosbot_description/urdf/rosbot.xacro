@@ -271,6 +271,16 @@
     <limit effort="1" velocity="10"/>
     <joint_properties damping="5.0" friction="1.0"/>
   </joint>
+  
+  <transmission name="astra_joint_trans" type="SimpleTransmission">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="astra_joint_motor">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="astra_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
 
   <link name="camera_link">
     <collision>
