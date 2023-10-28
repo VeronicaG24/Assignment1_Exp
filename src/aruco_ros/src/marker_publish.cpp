@@ -106,11 +106,12 @@ public:
         {
           std::cout << markers_.at(i).id << " ";
           if (markers_.at(i).id == marker_list[j]) {
-          	std_msgs::Bool bool_msg;
-    		bool_msg.data = true; // Imposta il valore booleano desiderato
+          	std_msgs::Bool ack_msg;
+          	// Imposta il valore booleano desiderato
+    		ack_msg.data = true; 
 
     		// Pubblica il messaggio
-    		bool_publisher.publish(bool_msg);
+    		ack_publisher.publish(ack_msg);
           }
         }
         std::cout << std::endl;
