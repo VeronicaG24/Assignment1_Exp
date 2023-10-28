@@ -41,7 +41,7 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
-
+#include <std_msgs/Bool.h>
 
 class ArucoMarkerPublisher
 {
@@ -59,6 +59,7 @@ private:
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
+  ros::Publisher ack_publisher = nh.advertise<std_msgs::Bool>("/ack_camera", 10);
 
   image_transport::Publisher image_pub_;
   image_transport::Publisher debug_pub_;
@@ -105,7 +106,11 @@ public:
         {
           std::cout << markers_.at(i).id << " ";
           if (markers_.at(i).id == marker_list[j]) {
-          	
+          	std_msgs::Bool bool_msg;
+    		bool_msg.data = true; // Imposta il valore booleano desiderato
+
+    		// Pubblica il messaggio
+    		bool_publisher.publish(bool_msg);
           }
         }
         std::cout << std::endl;
