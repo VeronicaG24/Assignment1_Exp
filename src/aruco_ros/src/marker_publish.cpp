@@ -23,7 +23,7 @@
 
  The views and conclusions contained in the software and documentation are those of the
  authors and should not be interpreted as representing official policies, either expressed
- or implied, of Rafael Muñoz Salinas. ok
+ or implied, of Rafael Muñoz Salinas.
  ********************************/
 /**
  * @file marker_publish.cpp
@@ -41,7 +41,7 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
-
+#include <std_msgs/Bool.h>
 
 class ArucoMarkerPublisher
 {
@@ -59,6 +59,7 @@ private:
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
+  ros::Publisher ack_publisher = nh.advertise<std_msgs::Bool>("/ack_camera", 10);
 
   image_transport::Publisher image_pub_;
   image_transport::Publisher debug_pub_;
@@ -105,7 +106,12 @@ public:
         {
           std::cout << markers_.at(i).id << " ";
           if (markers_.at(i).id == marker_list[j]) {
-          	
+          	std_msgs::Bool ack_msg;
+          	// Imposta il valore booleano desiderato
+    		ack_msg.data = true; 
+
+    		// Pubblica il messaggio
+    		ack_publisher.publish(ack_msg);
           }
         }
         std::cout << std::endl;
