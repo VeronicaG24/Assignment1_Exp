@@ -42,6 +42,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 
+
 class ArucoMarkerPublisher
 {
 private:
@@ -63,6 +64,10 @@ private:
   image_transport::Publisher debug_pub_;
 
   cv::Mat inImage_;
+  
+  // marker list
+  int marker_list[4] = {11, 12, 13, 15};
+  
   
 public:
   ArucoMarkerPublisher() :
@@ -99,6 +104,9 @@ public:
         for (std::size_t i = 0; i < markers_.size(); ++i)
         {
           std::cout << markers_.at(i).id << " ";
+          if (markers_.at(i).id == marker_list[j]) {
+          	
+          }
         }
         std::cout << std::endl;
 
