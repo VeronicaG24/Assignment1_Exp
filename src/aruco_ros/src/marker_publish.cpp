@@ -50,6 +50,11 @@ private:
   aruco::MarkerDetector mDetector_;
   std::vector<aruco::Marker> markers_;
   aruco::CameraParameters camParam_;
+  // markers id
+  std::vector<aruco::Marker> mark_detect={11, 12, 13, 15};
+  
+  // message
+  std_msgs::Bool ack_msg;
 
   // node params
   double marker_size_;
@@ -66,14 +71,20 @@ private:
 
   cv::Mat inImage_;
   
+<<<<<<< HEAD
   std::vector<int> marker_list;
  
+=======
+  
+  
+>>>>>>> 2b16a951a50a36a34e9ce7e9dc214ff25b871ed6
   
 public:
   ArucoMarkerPublisher() :
   	
   	nh_("~"), it_(nh_), useCamInfo_(true)
   {
+<<<<<<< HEAD
 	image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
 	image_pub_ = it_.advertise("result", 1);
 	debug_pub_ = it_.advertise("debug", 1);
@@ -83,6 +94,15 @@ public:
 	camParam_ = aruco::CameraParameters();
 	
 	nh_.param<std::vector<int>>("marker_list", marker_list, std::vector<int>());
+=======
+    image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
+    image_pub_ = it_.advertise("result", 1);
+    debug_pub_ = it_.advertise("debug", 1);
+    
+    nh_.param<bool>("use_camera_info", useCamInfo_, false);
+    ack_msg.data=false;
+    camParam_ = aruco::CameraParameters();
+>>>>>>> 2b16a951a50a36a34e9ce7e9dc214ff25b871ed6
   }
 
   void image_callback(const sensor_msgs::ImageConstPtr& msg)
@@ -117,8 +137,8 @@ public:
       std::cout << "The id of the detected marker detected is: ";
       for (std::size_t i = 0; i < markers_.size(); ++i) {
           std::cout << markers_.at(i).id << " ";
-          if (markers_.at(i).id == 12) {
-          	std_msgs::Bool ack_msg;
+          if (markers_.at(i).id == mark_detect.at(1).id) {
+          	std::cout<<"Here";
           	// Imposta il valore booleano desiderato
     		ack_msg.data = true; 
 
