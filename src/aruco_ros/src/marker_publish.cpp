@@ -71,20 +71,16 @@ private:
 
   cv::Mat inImage_;
   
-<<<<<<< HEAD
+
   std::vector<int> marker_list;
  
-=======
-  
-  
->>>>>>> 2b16a951a50a36a34e9ce7e9dc214ff25b871ed6
   
 public:
   ArucoMarkerPublisher() :
   	
   	nh_("~"), it_(nh_), useCamInfo_(true)
   {
-<<<<<<< HEAD
+
 	image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
 	image_pub_ = it_.advertise("result", 1);
 	debug_pub_ = it_.advertise("debug", 1);
@@ -94,7 +90,7 @@ public:
 	camParam_ = aruco::CameraParameters();
 	
 	nh_.param<std::vector<int>>("marker_list", marker_list, std::vector<int>());
-=======
+
     image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
     image_pub_ = it_.advertise("result", 1);
     debug_pub_ = it_.advertise("debug", 1);
@@ -102,7 +98,7 @@ public:
     nh_.param<bool>("use_camera_info", useCamInfo_, false);
     ack_msg.data=false;
     camParam_ = aruco::CameraParameters();
->>>>>>> 2b16a951a50a36a34e9ce7e9dc214ff25b871ed6
+
   }
 
   void image_callback(const sensor_msgs::ImageConstPtr& msg)

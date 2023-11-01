@@ -48,15 +48,14 @@ class image_feature:
     def callback(self, ros_data):
         '''Callback function of subscribed topic.
         Here images get converted and features detected'''
-<<<<<<< HEAD
-	
+
         #print('received image of type: "%s"' % ros_data.format)
         msgs = Float64()
         msgs.data=1.0
         self.joint_state_pub.publish(msgs)
-=======
+
         print('received image of type: "%s"' % ros_data.format)
->>>>>>> 2b16a951a50a36a34e9ce7e9dc214ff25b871ed6
+
         #### direct conversion to CV2 ##
         np_arr = np.fromstring(ros_data.data, np.uint8)
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)  # OpenCV >= 3.0:
