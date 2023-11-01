@@ -66,30 +66,43 @@ private:
 
   cv::Mat inImage_;
   
-  // marker list
-  int marker_list[4] = {11, 12, 13, 15};
-  
+  std::vector<int> marker_list;
+ 
   
 public:
   ArucoMarkerPublisher() :
-      nh_("~"), it_(nh_), useCamInfo_(true)
+  	
+  	nh_("~"), it_(nh_), useCamInfo_(true)
   {
-    image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
-    image_pub_ = it_.advertise("result", 1);
-    debug_pub_ = it_.advertise("debug", 1);
-    
-    nh_.param<bool>("use_camera_info", useCamInfo_, false);
-    camParam_ = aruco::CameraParameters();
+	image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
+	image_pub_ = it_.advertise("result", 1);
+	debug_pub_ = it_.advertise("debug", 1);
+	    
+	nh_.param<bool>("use_camera_info", useCamInfo_, false);
+	
+	camParam_ = aruco::CameraParameters();
+	
+	nh_.param<std::vector<int>>("marker_list", marker_list, std::vector<int>());
   }
 
   void image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
     bool publishImage = image_pub_.getNumSubscribers() > 0;
     bool publishDebug = debug_pub_.getNumSubscribers() > 0;
-
+    
+    std::cout << "Valori di marker_list: ";
+     for(int i=0; i < marker_list.size(); i++) {
+       std::cout << marker_list.at(i) << ' '; }
+    
+   /* for (int value : marker_list) {
+    	std::cout << value << " ";
+    }*/
+    std::cout << std::endl;
+    
     ros::Time curr_stamp = msg->header.stamp;
     cv_bridge::CvImagePtr cv_ptr;
     
+
     try
     {
       cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
@@ -100,10 +113,9 @@ public:
 
       // ok, let's detect
       mDetector_.detect(inImage_, markers_, camParam_, marker_size_, false);
-
-		std::cout << "The id of the detected marker detected is: ";
-        for (std::size_t i = 0; i < markers_.size(); ++i)
-        {
+	
+      std::cout << "The id of the detected marker detected is: ";
+      for (std::size_t i = 0; i < markers_.size(); ++i) {
           std::cout << markers_.at(i).id << " ";
           if (markers_.at(i).id == 12) {
           	std_msgs::Bool ack_msg;
@@ -154,8 +166,8 @@ public:
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "aruco_marker_publisher");
-
+  
   ArucoMarkerPublisher node;
-
+  
   ros::spin();
 }

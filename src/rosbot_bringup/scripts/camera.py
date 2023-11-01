@@ -47,7 +47,8 @@ class image_feature:
     def callback(self, ros_data):
         '''Callback function of subscribed topic.
         Here images get converted and features detected'''
-        print('received image of type: "%s"' % ros_data.format)
+	
+        #print('received image of type: "%s"' % ros_data.format)
         msgs = Float64()
         msgs.data=1.0
         self.joint_state_pub.publish(msgs)
