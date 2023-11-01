@@ -43,17 +43,23 @@ class image_feature:
         # subscribed Topic
         self.subscriber_ack = rospy.Subscriber("/ack_camera",
                                            Bool, self.ack_callback, queue_size=1)
+        self.ack_data=False
 
     def callback(self, ros_data):
         '''Callback function of subscribed topic.
         Here images get converted and features detected'''
         print('received image of type: "%s"' % ros_data.format)
-        msgs = Float64()
-        msgs.data=1.0
-        self.joint_state_pub.publish(msgs)
         #### direct conversion to CV2 ##
         np_arr = np.fromstring(ros_data.data, np.uint8)
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)  # OpenCV >= 3.0:
+        msgs = Float64()
+        if not(self.ack_data):
+          msgs.data=0.5
+          
+          self.joint_state_pub.publish(msgs)
+          
+        else :
+          print("lllll")
 
         # Update the points queue
         # pts.appendleft(center)
@@ -61,16 +67,18 @@ class image_feature:
         #cv2.waitKey(2)
         
 
-        # self.subscriber.unregister()
+        #self.subscriber.unregister()
         
     def ack_callback(self, ack):
-        rospy.loginfo("Ack received: %s", ack.data)
+        #rospy.loginfo("Ack received: %s", ack.data)
+        msgs = Float64()
         if ack.data:
-           msgs = Float64()
            msgs.data=0.0
            self.joint_state_pub.publish(msgs)
+           self.ack_data=ack.data
+           print("Ack is: "+str(self.ack_data))
            
-	
+        
 
 def main(args):
     '''Initializes and cleanup ros node'''

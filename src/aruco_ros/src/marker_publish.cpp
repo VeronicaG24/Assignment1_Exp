@@ -50,6 +50,11 @@ private:
   aruco::MarkerDetector mDetector_;
   std::vector<aruco::Marker> markers_;
   aruco::CameraParameters camParam_;
+  // markers id
+  std::vector<aruco::Marker> mark_detect={11, 12, 13, 15};
+  
+  // message
+  std_msgs::Bool ack_msg;
 
   // node params
   double marker_size_;
@@ -66,8 +71,7 @@ private:
 
   cv::Mat inImage_;
   
-  // marker list
-  int marker_list[4] = {11, 12, 13, 15};
+  
   
   
 public:
@@ -79,6 +83,7 @@ public:
     debug_pub_ = it_.advertise("debug", 1);
     
     nh_.param<bool>("use_camera_info", useCamInfo_, false);
+    ack_msg.data=false;
     camParam_ = aruco::CameraParameters();
   }
 
@@ -105,8 +110,8 @@ public:
         for (std::size_t i = 0; i < markers_.size(); ++i)
         {
           std::cout << markers_.at(i).id << " ";
-          if (markers_.at(i).id == 12) {
-          	std_msgs::Bool ack_msg;
+          if (markers_.at(i).id == mark_detect.at(1).id) {
+          	std::cout<<"Here";
           	// Imposta il valore booleano desiderato
     		ack_msg.data = true; 
 
