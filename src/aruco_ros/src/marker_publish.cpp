@@ -59,7 +59,7 @@ private:
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-  ros::Publisher ack_publisher = nh.advertise<std_msgs::Bool>("/ack_camera", 10);
+  ros::Publisher ack_publisher = nh_.advertise<std_msgs::Bool>("/ack_camera", 10);
 
   image_transport::Publisher image_pub_;
   image_transport::Publisher debug_pub_;
@@ -105,7 +105,7 @@ public:
         for (std::size_t i = 0; i < markers_.size(); ++i)
         {
           std::cout << markers_.at(i).id << " ";
-          if (markers_.at(i).id == marker_list[j]) {
+          if (markers_.at(i).id == 12) {
           	std_msgs::Bool ack_msg;
           	// Imposta il valore booleano desiderato
     		ack_msg.data = true; 
