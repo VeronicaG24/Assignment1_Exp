@@ -18,7 +18,7 @@ import roslib
 import rospy
 
 # Ros Messages
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Bool
 from sensor_msgs.msg import CompressedImage
 from sensor_msgs.msg import JointState  # Import JointState message
 from geometry_msgs.msg import Twist
@@ -40,6 +40,9 @@ class image_feature:
         # subscribed Topic
         self.subscriber = rospy.Subscriber("/camera/color/image_raw/compressed",
                                            CompressedImage, self.callback, queue_size=1)
+        # subscribed Topic
+        self.subscriber_ack = rospy.Subscriber("/ack_camera",
+                                           Bool, self.ack_callback, queue_size=1)
 
     def callback(self, ros_data):
         '''Callback function of subscribed topic.
@@ -59,7 +62,15 @@ class image_feature:
         
 
         # self.subscriber.unregister()
-
+        
+    def ack_callback(self, ack):
+        rospy.loginfo("Ack received: %s", ack.data)
+        if ack.data:
+           msgs = Float64()
+           msgs.data=0.0
+           self.joint_state_pub.publish(msgs)
+           
+	
 
 def main(args):
     '''Initializes and cleanup ros node'''
