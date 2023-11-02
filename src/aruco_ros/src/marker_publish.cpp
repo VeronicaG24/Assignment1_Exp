@@ -37,11 +37,15 @@
 #include <aruco/aruco.h>
 #include <aruco/cvdrawingutils.h>
 
+#include <XmlRpcValue.h>
+
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 #include <std_msgs/Bool.h>
+
+std::vector<int> my_marker_list;
 
 class ArucoMarkerPublisher
 {
@@ -70,9 +74,6 @@ private:
   image_transport::Publisher debug_pub_;
 
   cv::Mat inImage_;
-  
-
-  std::vector<int> marker_list;
  
   
 public:
@@ -89,16 +90,19 @@ public:
 	
 	camParam_ = aruco::CameraParameters();
 	
-	//nh_.param<std::vector<int>>("marker_list", marker_list, std::vector<int>());
 
     image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
     image_pub_ = it_.advertise("result", 1);
     debug_pub_ = it_.advertise("debug", 1);
-    
-    nh_.param<bool>("use_camera_info", useCamInfo_, false);
-    ack_msg.data=false;
-    camParam_ = aruco::CameraParameters();
 
+    
+    	nh_.param<bool>("use_camera_info", useCamInfo_, false);
+    	ack_msg.data=false;
+    	camParam_ = aruco::CameraParameters();
+    	
+    	if (!nh_.getParam("/marker_publisher/marker_list", my_marker_list)) {
+    		ROS_ERROR("Impossibile ottenere il parametro '/marker_publisher/marker_list'");
+    	}
   }
 
   void image_callback(const sensor_msgs::ImageConstPtr& msg)
@@ -106,19 +110,11 @@ public:
     bool publishImage = image_pub_.getNumSubscribers() > 0;
     bool publishDebug = debug_pub_.getNumSubscribers() > 0;
     
-    /*std::cout << "Valori di marker_list: ";
-     for(int i=0; i < marker_list.size(); i++) {
-       std::cout << marker_list.at(i) << ' '; }
-    
-    for (int value : marker_list) {
-    	std::cout << value << " ";
-    }*/
-    std::cout << std::endl;
-    
+
     ros::Time curr_stamp = msg->header.stamp;
     cv_bridge::CvImagePtr cv_ptr;
     
-
+    
     try
     {
       cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
@@ -129,7 +125,14 @@ public:
 
       // ok, let's detect
       mDetector_.detect(inImage_, markers_, camParam_, marker_size_, false);
-	
+      
+      // Show marker list
+      std::cout << "marker_list: ";
+      for (const auto &value : my_marker_list) {
+      	std::cout << value << " ";
+      }
+      std::cout << std::endl;
+		
       std::cout << "The id of the detected marker detected is: ";
       for (std::size_t i = 0; i < markers_.size(); ++i) {
           std::cout << markers_.at(i).id << " ";
@@ -176,7 +179,8 @@ public:
     {
       ROS_ERROR("cv_bridge exception: %s", e.what());
     }
-  }
+   }
+  
 };
 
 int main(int argc, char **argv)
