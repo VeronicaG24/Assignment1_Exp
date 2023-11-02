@@ -5,6 +5,10 @@
   <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner" output="screen" args="--namespace=/robot_exp
   joint_state_controller
   camera_velocity_controller
+  front_left_wheel_velocity_controller
+  front_right_wheel_velocity_controller
+  rear_left_wheel_velocity_controller
+  rear_right_wheel_velocity_controller
   --shutdown-timeout 3"/>
 
   <param name="robot_description" command="$(find xacro)/xacro '$(find rosbot_description)/urdf/rosbot.xacro'"/>
