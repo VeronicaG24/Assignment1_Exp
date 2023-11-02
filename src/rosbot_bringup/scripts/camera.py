@@ -23,7 +23,11 @@ from sensor_msgs.msg import CompressedImage
 from sensor_msgs.msg import JointState  # Import JointState message
 from geometry_msgs.msg import Twist
 
+import numpy as np
+
 VERBOSE = False
+
+vel_camera = 0.2
 
 
 class image_feature:
@@ -44,6 +48,9 @@ class image_feature:
         self.subscriber_ack = rospy.Subscriber("/ack_camera",
                                            Bool, self.ack_callback, queue_size=1)
         self.ack_data=False
+        
+        self.position = 0.0  # posizione corrente
+        self.last_update_time = rospy.Time.now()
 
     def callback(self, ros_data):
         '''Callback function of subscribed topic.
@@ -56,9 +63,17 @@ class image_feature:
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)  # OpenCV >= 3.0:
         msgs = Float64()
         if not(self.ack_data):
-        	msgs.data=1.0
+        	msgs.data = vel_camera
           
         self.joint_state_pub.publish(msgs)
+        
+        # Aggiorna la posizione corrente
+        current_time = rospy.Time.now()
+        delta_time = (current_time - self.last_update_time).to_sec()
+        self.position += (vel_camera * delta_time)
+        self.last_update_time = current_time
+        
+        print("The position is: "+str(self.position))
         
         print("Ack is: "+str(self.ack_data))
         print("Msg is: "+str(msgs.data))
@@ -78,6 +93,8 @@ class image_feature:
         if ack.data:
            msgs.data=0.0
            self.joint_state_pub.publish(msgs)
+           # fai ruotare il robot per farlo allineare alla camera:
+           # due ruote in un senso e due nell'altro e la camera a velocità opposta
         
         print("Ack is: "+str(self.ack_data))
         print("Msg is: "+str(msgs.data))
