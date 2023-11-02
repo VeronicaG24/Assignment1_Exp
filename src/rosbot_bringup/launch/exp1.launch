@@ -10,7 +10,7 @@
 	</node>
 
 	<node pkg="aruco_ros" type="marker_publisher" name="aruco_marker_publisher" output="screen">
-		<param name="marker_list" value = "[11, 12, 13, 15]" />
+		
 		<remap from="/image" to="/camera/color/image_raw"/>
 	</node>
 

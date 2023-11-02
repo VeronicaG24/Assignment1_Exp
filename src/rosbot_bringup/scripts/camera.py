@@ -49,25 +49,17 @@ class image_feature:
         '''Callback function of subscribed topic.
         Here images get converted and features detected'''
 
-        #print('received image of type: "%s"' % ros_data.format)
-        msgs = Float64()
-        msgs.data=1.0
-        self.joint_state_pub.publish(msgs)
-
         print('received image of type: "%s"' % ros_data.format)
 
         #### direct conversion to CV2 ##
-        np_arr = np.fromstring(ros_data.data, np.uint8)
+        np_arr = np.frombuffer(ros_data.data, np.uint8)
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)  # OpenCV >= 3.0:
         msgs = Float64()
         if not(self.ack_data):
-          msgs.data=0.5
+          msgs.data=1.0
           
           self.joint_state_pub.publish(msgs)
           
-        else :
-          print("lllll")
-
         # Update the points queue
         # pts.appendleft(center)
         #cv2.imshow('window', image_np)

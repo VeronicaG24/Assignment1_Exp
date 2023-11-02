@@ -89,7 +89,7 @@ public:
 	
 	camParam_ = aruco::CameraParameters();
 	
-	nh_.param<std::vector<int>>("marker_list", marker_list, std::vector<int>());
+	//nh_.param<std::vector<int>>("marker_list", marker_list, std::vector<int>());
 
     image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
     image_pub_ = it_.advertise("result", 1);
@@ -106,11 +106,11 @@ public:
     bool publishImage = image_pub_.getNumSubscribers() > 0;
     bool publishDebug = debug_pub_.getNumSubscribers() > 0;
     
-    std::cout << "Valori di marker_list: ";
+    /*std::cout << "Valori di marker_list: ";
      for(int i=0; i < marker_list.size(); i++) {
        std::cout << marker_list.at(i) << ' '; }
     
-   /* for (int value : marker_list) {
+    for (int value : marker_list) {
     	std::cout << value << " ";
     }*/
     std::cout << std::endl;
