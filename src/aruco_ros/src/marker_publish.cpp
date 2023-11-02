@@ -136,8 +136,8 @@ public:
       std::cout << "The id of the detected marker detected is: ";
       for (std::size_t i = 0; i < markers_.size(); ++i) {
           std::cout << markers_.at(i).id << " ";
-          if (markers_.at(i).id == mark_detect.at(1).id) {
-          	std::cout<<"Here";
+          if (markers_.at(i).id == my_marker_list.at(1)) {
+          	std::cout<<"Here\n";
           	// Imposta il valore booleano desiderato
     		ack_msg.data = true; 
 

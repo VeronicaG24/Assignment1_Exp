@@ -35,7 +35,7 @@ class image_feature:
         self.vel_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=1)
 
         # Aggiunto il publisher per il messaggio JointState
-        self.joint_state_pub = rospy.Publisher("/robot_exp/camera_position_controller/command", Float64, queue_size=1)
+        self.joint_state_pub = rospy.Publisher("/robot_exp/camera_velocity_controller/command", Float64, queue_size=1)
 
         # subscribed Topic
         self.subscriber = rospy.Subscriber("/camera/color/image_raw/compressed",
@@ -49,16 +49,19 @@ class image_feature:
         '''Callback function of subscribed topic.
         Here images get converted and features detected'''
 
-        print('received image of type: "%s"' % ros_data.format)
+        #print('received image of type: "%s"' % ros_data.format)
 
         #### direct conversion to CV2 ##
         np_arr = np.frombuffer(ros_data.data, np.uint8)
         image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)  # OpenCV >= 3.0:
         msgs = Float64()
         if not(self.ack_data):
-          msgs.data=1.0
+        	msgs.data=1.0
           
-          self.joint_state_pub.publish(msgs)
+        self.joint_state_pub.publish(msgs)
+        
+        print("Ack is: "+str(self.ack_data))
+        print("Msg is: "+str(msgs.data))
           
         # Update the points queue
         # pts.appendleft(center)
@@ -71,11 +74,13 @@ class image_feature:
     def ack_callback(self, ack):
         #rospy.loginfo("Ack received: %s", ack.data)
         msgs = Float64()
+        self.ack_data=ack.data
         if ack.data:
            msgs.data=0.0
            self.joint_state_pub.publish(msgs)
-           self.ack_data=ack.data
-           print("Ack is: "+str(self.ack_data))
+        
+        print("Ack is: "+str(self.ack_data))
+        print("Msg is: "+str(msgs.data))
            
         
 
