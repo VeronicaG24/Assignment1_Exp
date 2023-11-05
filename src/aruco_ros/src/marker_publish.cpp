@@ -43,7 +43,11 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
+
 #include <std_msgs/Bool.h>
+#include <geometry_msgs/Point.h>
+#include <std_msgs/Float64.h>
+
 
 std::vector<int> my_marker_list;
 
@@ -59,6 +63,8 @@ private:
   
   // message
   std_msgs::Bool ack_msg;
+  geometry_msgs::Point marker_center;
+  std_msgs::Float64 pixel_msg;
 
   // node params
   double marker_size_;
@@ -68,7 +74,11 @@ private:
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-  ros::Publisher ack_publisher = nh_.advertise<std_msgs::Bool>("/ack_camera", 10);
+  ros::Publisher ack_publisher;// = nh_.advertise<std_msgs::Bool>("/ack_camera", 10);
+  ros::Publisher marker_point_publisher;// = nh_.advertise<geometry_msgs::Point>("/marker_point", 10);
+  ros::Publisher pixel_side_publisher;// = nh_.advertise<std_msgs::Float64>("/pixel_side_marker", 10);
+
+
 
   image_transport::Publisher image_pub_;
   image_transport::Publisher debug_pub_;
@@ -103,6 +113,9 @@ public:
     	if (!nh_.getParam("/marker_publisher/marker_list", my_marker_list)) {
     		ROS_ERROR("Impossibile ottenere il parametro '/marker_publisher/marker_list'");
     	}
+    ack_publisher = nh_.advertise<std_msgs::Bool>("/ack_camera", 10);
+    marker_point_publisher = nh_.advertise<geometry_msgs::Point>("/marker_point", 10);
+    pixel_side_publisher = nh_.advertise<std_msgs::Float64>("/pixel_side_marker", 10);
   }
 
   void image_callback(const sensor_msgs::ImageConstPtr& msg)
@@ -136,16 +149,34 @@ public:
       std::cout << "The id of the detected marker detected is: ";
       for (std::size_t i = 0; i < markers_.size(); ++i) {
           std::cout << markers_.at(i).id << " ";
-          if (markers_.at(i).id == my_marker_list.at(1)) {
+          if (markers_.at(i).id == my_marker_list.at(0)) {
           	std::cout<<"Here\n";
           	// Imposta il valore booleano desiderato
     		ack_msg.data = true; 
 
     		// Pubblica il messaggio
     		ack_publisher.publish(ack_msg);
+    		
+    		std::cout << "Center: " << markers_.at(i).getCenter() << std::endl;
+		std::cout << "Center X: " << markers_.at(i).getCenter().x << " Y: " << markers_.at(i).getCenter().y << std::endl; //markers_.at(i).getPerimeter()
+		std::cout << "Perimeter: " << markers_.at(i).getPerimeter() << std::endl;
+		std::cout << "lato pixel: " << (markers_.at(i).getPerimeter())/4.0 << std::endl;
+		
+		// Imposta le coordinate x e y del centro del marker
+               marker_center.x = markers_.at(i).getCenter().x;
+               marker_center.y = markers_.at(i).getCenter().y;
+
+	       // Pubblica il messaggio con il centro del marker
+               marker_point_publisher.publish(marker_center);
+               
+               pixel_msg.data = (markers_.at(i).getPerimeter())/4.0;
+               pixel_side_publisher.publish(pixel_msg);
+
+        	
           }
         }
-        std::cout << std::endl;
+       std::cout << std::endl;
+       
 
       // draw detected markers on the image for visualization
       for (std::size_t i = 0; i < markers_.size(); ++i)
