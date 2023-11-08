@@ -70,6 +70,8 @@ class image_feature:
 
         self.center_x = 0.0
         self.center_y = 0.0
+        
+        self.centered = False
 
         # Get the parameter for operation mode -> 0: camera fixed, 1: camera moving
         self.mode = rospy.get_param('/marker_publisher/mode')
@@ -102,19 +104,24 @@ class image_feature:
 
         if self.mode == 0:
             vel = Twist()
-            if not self.ack_data:
+            if not self.ack_data or not self.centered:
                 vel.linear.x = 0.0
-                vel.angular.z = 1.0
+                vel.angular.z = 0.2
+                print("Sono QUI!!!")
+                print("Centered2 is: " + str(self.centered))
                 
             self.vel_pub.publish(vel)
-            print("Ack is: " + str(self.ack_data))
-            print("Vel is: " + str(vel.angular.z))
+            print("Ack2 is: " + str(self.ack_data))
+            print("Vel2 is: " + str(vel.angular.z))
 
-            if self.can_move:
+            if self.can_move and self.centered:
                 print("MI MUOVO!!")
+                print("Diff: " + str(abs(self.center_x - (self.current_pixel_side/2))))
+                
                 if self.current_pixel_side > 170:
                     print("\n********** CI SONO ARRIVATO! **********\n")
                     self.stop = True
+                    self.centered = False
                     # Se current_pixel_side è maggiore di 200, ferma il robot
                     vel = Twist()
                     vel.linear.x = 0.0
@@ -122,18 +129,13 @@ class image_feature:
                     self.vel_pub.publish(vel)
 
                 else:
-                    # Calcola le velocità lineari e angolari per muovere il robot verso center_x e center_y
-                    # Puoi regolare questi valori in base alle tue esigenze
-
-                    # sradius = math.atan2(self.center_y, self.center_x)
-
                     # Build twist msg
                     if not self.stop:
                         cmd_vel = Twist()
                         cmd_vel.linear.x = 0.1  # lin_control
                         cmd_vel.angular.z = 0.0
-
                         self.vel_pub.publish(cmd_vel)
+                        self.stop = False
         
         elif self.mode == 1:
             msgs = Float64()
@@ -169,48 +171,47 @@ class image_feature:
                         cmd_vel.angular.z = 0.0
 
     def ack_callback(self, ack):
-        # rospy.loginfo("Ack received: %s", ack.data)
-        msgs = Float64()
-        self.ack_data = ack.data
-        if ack.data:
-            msgs.data = 0.0
-            self.joint_state_pub.publish(msgs)
+       
+        if (self.mode == 0):
+            vel = Twist()
+            self.ack_data = ack.data
+            if ack.data and abs(self.center_x - (self.current_pixel_side/2)) <= 10 and self.center_x > 0 and self.current_pixel_side > 0:
+                print("\n\n\n\n\n\n\n\n\n\n SONO QUI!!! \n\n\n\n\n\n\n\n\n\n\n")
+                print("Diff: " + str(abs(self.center_x - (self.current_pixel_side/2))))
+                print("Center_x is: " + str(self.center_x))
+                print("Current_pixel is: " + str(self.current_pixel_side/2))
+                vel.linear.x = 0.0
+                vel.angular.z = 0.0
+                self.vel_pub.publish(vel)
+                self.centered = True
+                
             # fai ruotare il robot per farlo allineare alla camera:
             # due ruote in un senso e due nell'altro e la camera a velocità opposta
+            
+            print("Diff: " + str(abs(self.center_x - (self.current_pixel_side/2))))
+            print("Centered is: " + str(self.centered))
+            print("Ack is: " + str(self.ack_data))
+            print("Center x is: " + str(self.center_x))
+        
+        elif (self.mode == 1):
+            msgs = Float64()
+            self.ack_data = ack.data
+            if ack.data:
+                msgs.data = 0.0
+                self.joint_state_pub.publish(msgs)
+                # fai ruotare il robot per farlo allineare alla camera:
+                # due ruote in un senso e due nell'altro e la camera a velocità opposta
 
-        print("Ack is: " + str(self.ack_data))
-        print("Msg is: " + str(msgs.data))
+            print("Ack is: " + str(self.ack_data))
+            print("Msg is: " + str(msgs.data))
 
     def marker_center_callback(self, data):
-        """if abs(self.position_robot_z - self.position_camera_z) <= 0.05:
-            vel = Twist()
-            vel.linear.x = 0.0
-            vel.angular.z = 0.0
-            self.vel_pub.publish(vel)
-
-            msgs = Float64()
-            msgs.data = 0.0
-            self.joint_state_pub.publish(msgs)
-
+        if self.centered:
             self.can_move = True
-
-        else:
-            vel = Twist()
-            vel.linear.x = 0.0
-            vel.angular.z = 0.5
-            self.vel_pub.publish(vel)
-
-            msgs = Float64()
-            msgs.data = -0.5
-            self.joint_state_pub.publish(msgs)
-
-        print("The camera position is: " + str(self.position_camera_z))
-        print("The robot position is: " + str(self.position_robot_z))
-	"""
-        self.can_move = True
-        center_x = data.x
-        center_y = data.y
-        rospy.loginfo("Center XXXXXXXX: %f, Center YYYYYY: %f", center_x, center_y)
+        	
+        self.center_x = data.x
+        self.center_y = data.y
+        rospy.loginfo("Center XXXXXXXX: %f, Center YYYYYY: %f", self.center_x, self.center_y)
 
     def pixel_callback(self, data):
         self.current_pixel_side = data.data

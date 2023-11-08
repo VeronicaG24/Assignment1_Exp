@@ -47,6 +47,7 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Point.h>
 #include <std_msgs/Float64.h>
+#include <opencv2/opencv.hpp>
 
 
 std::vector<int> my_marker_list;
@@ -168,7 +169,8 @@ public:
 		std::cout << "Center X: " << markers_.at(i).getCenter().x << " Y: " << markers_.at(i).getCenter().y << std::endl; //markers_.at(i).getPerimeter()
 		std::cout << "Perimeter: " << markers_.at(i).getPerimeter() << std::endl;
 		std::cout << "lato pixel: " << (markers_.at(i).getPerimeter())/4.0 << std::endl;
-		
+
+
 		// Imposta le coordinate x e y del centro del marker
                marker_center.x = markers_.at(i).getCenter().x;
                marker_center.y = markers_.at(i).getCenter().y;
