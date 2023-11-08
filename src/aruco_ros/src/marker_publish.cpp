@@ -37,8 +37,6 @@
 #include <aruco/aruco.h>
 #include <aruco/cvdrawingutils.h>
 
-#include <XmlRpcValue.h>
-
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
@@ -47,11 +45,8 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Point.h>
 #include <std_msgs/Float64.h>
-#include <opencv2/opencv.hpp>
+#include <std_msgs/Int32.h>
 
-
-std::vector<int> my_marker_list;
-int mode = 0;
 
 class ArucoMarkerPublisher
 {
@@ -60,13 +55,12 @@ private:
   aruco::MarkerDetector mDetector_;
   std::vector<aruco::Marker> markers_;
   aruco::CameraParameters camParam_;
-  // markers id
-  std::vector<aruco::Marker> mark_detect={11, 12, 13, 15};
   
   // message
   std_msgs::Bool ack_msg;
   geometry_msgs::Point marker_center;
   std_msgs::Float64 pixel_msg;
+  std_msgs::Int32 marker_id_msg;
 
   // node params
   double marker_size_;
@@ -76,64 +70,42 @@ private:
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-  ros::Publisher ack_publisher;// = nh_.advertise<std_msgs::Bool>("/ack_camera", 10);
-  ros::Publisher marker_point_publisher;// = nh_.advertise<geometry_msgs::Point>("/marker_point", 10);
-  ros::Publisher pixel_side_publisher;// = nh_.advertise<std_msgs::Float64>("/pixel_side_marker", 10);
+  
+  ros::Publisher ack_publisher;
+  ros::Publisher marker_point_publisher;
+  ros::Publisher pixel_side_publisher;
+  ros::Publisher id_pub;
 
   image_transport::Publisher image_pub_;
   image_transport::Publisher debug_pub_;
 
   cv::Mat inImage_;
- 
   
 public:
   ArucoMarkerPublisher() :
-  	
-  	nh_("~"), it_(nh_), useCamInfo_(true)
+      nh_("~"), it_(nh_), useCamInfo_(true)
   {
-
-	image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
-	image_pub_ = it_.advertise("result", 1);
-	debug_pub_ = it_.advertise("debug", 1);
-	    
-	nh_.param<bool>("use_camera_info", useCamInfo_, false);
-	
-	camParam_ = aruco::CameraParameters();
-	
-
     image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
     image_pub_ = it_.advertise("result", 1);
     debug_pub_ = it_.advertise("debug", 1);
-
     
-    	nh_.param<bool>("use_camera_info", useCamInfo_, false);
-    	ack_msg.data=false;
-    	camParam_ = aruco::CameraParameters();
-    	
-    	// get list of the marker
-    	if (!nh_.getParam("/marker_publisher/marker_list", my_marker_list)) {
-    		ROS_ERROR("Impossibile ottenere il parametro '/marker_publisher/marker_list'");
-    	}
-    	
-    	// get operating mode 0: camera fixed, 1: camera moving
-    	if (!nh_.getParam("/marker_publisher/mode", mode)) {
-    		ROS_ERROR("Impossibile ottenere il parametro '/marker_publisher/mode'");
-    	}
-    	
+    nh_.param<bool>("use_camera_info", useCamInfo_, false);
+    camParam_ = aruco::CameraParameters();
+    
     ack_publisher = nh_.advertise<std_msgs::Bool>("/ack_camera", 10);
     marker_point_publisher = nh_.advertise<geometry_msgs::Point>("/marker_point", 10);
     pixel_side_publisher = nh_.advertise<std_msgs::Float64>("/pixel_side_marker", 10);
+    id_pub = nh_.advertise<std_msgs::Int32>("/id_publisher", 10);
+
   }
 
   void image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
     bool publishImage = image_pub_.getNumSubscribers() > 0;
     bool publishDebug = debug_pub_.getNumSubscribers() > 0;
-    
 
     ros::Time curr_stamp = msg->header.stamp;
     cv_bridge::CvImagePtr cv_ptr;
-    
     
     try
     {
@@ -145,48 +117,27 @@ public:
 
       // ok, let's detect
       mDetector_.detect(inImage_, markers_, camParam_, marker_size_, false);
-      
-      // Show marker list
-      std::cout << "marker_list: ";
-      for (const auto &value : my_marker_list) {
-      	std::cout << value << " ";
-      }
-      std::cout << std::endl;
-		
-      std::cout << "The id of the detected marker detected is: ";
-      for (std::size_t i = 0; i < markers_.size(); ++i) {
+
+		std::cout << "The id of the detected marker detected is: ";
+        for (std::size_t i = 0; i < markers_.size(); ++i)
+        {
           std::cout << markers_.at(i).id << " ";
-          if (markers_.at(i).id == my_marker_list.at(0)) {
-          	std::cout<<"Here\n";
-          	
-          	// Imposta il valore booleano desiderato
-    		ack_msg.data = true; 
-
-    		// Pubblica il messaggio
-    		ack_publisher.publish(ack_msg);
-    		
-    		std::cout << "Center: " << markers_.at(i).getCenter() << std::endl;
-		std::cout << "Center X: " << markers_.at(i).getCenter().x << " Y: " << markers_.at(i).getCenter().y << std::endl; //markers_.at(i).getPerimeter()
-		std::cout << "Perimeter: " << markers_.at(i).getPerimeter() << std::endl;
-		std::cout << "lato pixel: " << (markers_.at(i).getPerimeter())/4.0 << std::endl;
-
-
-		// Imposta le coordinate x e y del centro del marker
-               marker_center.x = markers_.at(i).getCenter().x;
-               marker_center.y = markers_.at(i).getCenter().y;
-
-	       // Pubblica il messaggio con il centro del marker
-               marker_point_publisher.publish(marker_center);
-               
-               pixel_msg.data = (markers_.at(i).getPerimeter())/4.0;
-               pixel_side_publisher.publish(pixel_msg);
-
-        	
-          }
+          
+          // Send the current ID
+          marker_id_msg.data = markers_.at(i).id;
+          id_pub.publish(marker_id_msg);
+          
+          // Send current marker center position
+          marker_center.x = markers_.at(i).getCenter().x;
+          marker_center.y = markers_.at(i).getCenter().y;
+          marker_point_publisher.publish(marker_center);
+          
+          // Send the side pixel
+          pixel_msg.data = (markers_.at(i).getPerimeter())/4.0;
+          pixel_side_publisher.publish(pixel_msg);
+          
         }
-        
-       std::cout << std::endl;
-       
+        std::cout << std::endl;
 
       // draw detected markers on the image for visualization
       for (std::size_t i = 0; i < markers_.size(); ++i)
@@ -220,15 +171,14 @@ public:
     {
       ROS_ERROR("cv_bridge exception: %s", e.what());
     }
-   }
-  
+  }
 };
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "aruco_marker_publisher");
-  
+
   ArucoMarkerPublisher node;
-  
+
   ros::spin();
 }
