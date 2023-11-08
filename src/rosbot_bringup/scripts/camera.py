@@ -92,8 +92,8 @@ class image_feature:
         self.position_robot_y = data.pose[idx_base].position.y
         self.position_robot_z = data.pose[idx_base].position.z
 
-        print("The camera position is: " + str(self.position_camera_z))
-        print("The robot position is: " + str(self.position_robot_z))
+        #print("The camera position is: " + str(self.position_camera_z))
+        #print("The robot position is: " + str(self.position_robot_z))
 
     def move_callback(self, ros_data):
         '''Callback function of subscribed topic.
@@ -107,17 +107,13 @@ class image_feature:
             if not self.ack_data or not self.centered:
                 vel.linear.x = 0.0
                 vel.angular.z = 0.2
-                print("Sono QUI!!!")
-                print("Centered2 is: " + str(self.centered))
+                print("Non ho il marker e non sono allineato!!!")
                 
             self.vel_pub.publish(vel)
-            print("Ack2 is: " + str(self.ack_data))
-            print("Vel2 is: " + str(vel.angular.z))
 
             if self.can_move and self.centered:
                 print("MI MUOVO!!")
                 print("Diff: " + str(abs(self.center_x - (self.current_pixel_side/2))))
-                
                 if self.current_pixel_side > 170:
                     print("\n********** CI SONO ARRIVATO! **********\n")
                     self.stop = True
@@ -144,13 +140,10 @@ class image_feature:
 
             self.joint_state_pub.publish(msgs)
 
-            print("Ack is: " + str(self.ack_data))
-            print("Msg is: " + str(msgs.data))
-
             if self.can_move:
                 print("MI MUOVO!!")
                 if self.current_pixel_side > 170:
-                    print("\n********** CI SONO ARRIVATO! **********\n")
+                    print("SONO ARRIVATO!")
                     self.stop = True
                     # Se current_pixel_side è maggiore di 200, ferma il robot
                     vel = Twist()
@@ -175,11 +168,12 @@ class image_feature:
         if (self.mode == 0):
             vel = Twist()
             self.ack_data = ack.data
-            if ack.data and abs(self.center_x - (self.current_pixel_side/2)) <= 10 and self.center_x > 0 and self.current_pixel_side > 0:
-                print("\n\n\n\n\n\n\n\n\n\n SONO QUI!!! \n\n\n\n\n\n\n\n\n\n\n")
-                print("Diff: " + str(abs(self.center_x - (self.current_pixel_side/2))))
-                print("Center_x is: " + str(self.center_x))
-                print("Current_pixel is: " + str(self.current_pixel_side/2))
+            print("\n\n\n\n\n\n\n\n\n\n\n\n NON STO ENTRANDOOOOO!!!! \n\n\n\n\n\n\n\n\n\n\n\n")
+            print("center_x : " + str(self.center_x))
+            print("current pixel side: " + str(self.current_pixel_side/2))
+            if ack.data and abs(self.center_x - 640/2) <= 5 and self.center_x > 0 and self.current_pixel_side > 0:
+                print("SONO DENTRO AL MOVIEMTNO!!!!")
+                #print("Diff: " + str(abs(self.center_x - (self.current_pixel_side/2))))
                 vel.linear.x = 0.0
                 vel.angular.z = 0.0
                 self.vel_pub.publish(vel)
@@ -188,10 +182,7 @@ class image_feature:
             # fai ruotare il robot per farlo allineare alla camera:
             # due ruote in un senso e due nell'altro e la camera a velocità opposta
             
-            print("Diff: " + str(abs(self.center_x - (self.current_pixel_side/2))))
-            print("Centered is: " + str(self.centered))
-            print("Ack is: " + str(self.ack_data))
-            print("Center x is: " + str(self.center_x))
+            print("Diff: " + str(abs(self.center_x - 640/2)))
         
         elif (self.mode == 1):
             msgs = Float64()
@@ -202,8 +193,8 @@ class image_feature:
                 # fai ruotare il robot per farlo allineare alla camera:
                 # due ruote in un senso e due nell'altro e la camera a velocità opposta
 
-            print("Ack is: " + str(self.ack_data))
-            print("Msg is: " + str(msgs.data))
+            #print("Ack is: " + str(self.ack_data))
+            #print("Msg is: " + str(msgs.data))
 
     def marker_center_callback(self, data):
         if self.centered:
@@ -211,11 +202,9 @@ class image_feature:
         	
         self.center_x = data.x
         self.center_y = data.y
-        rospy.loginfo("Center XXXXXXXX: %f, Center YYYYYY: %f", self.center_x, self.center_y)
 
     def pixel_callback(self, data):
         self.current_pixel_side = data.data
-        rospy.loginfo("PIXELLLLL: %f", self.current_pixel_side)
 
 def main(args):
     '''Initializes and cleanup ros node'''
