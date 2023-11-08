@@ -3,6 +3,8 @@
 	
 	<rosparam param="/marker_publisher/marker_list"> [11, 12, 13, 15] </rosparam>
 	
+	<rosparam param="/marker_publisher/mode"> 0 </rosparam> <!-- 0: camera fixed, 1: camera moving -->
+	
 	<include file="$(find rosbot_gazebo)/launch/rosbot_world.launch"></include>
 
  	<include file="$(find rosbot_bringup)/launch/rosbot_gazebo.launch"></include>
@@ -11,7 +13,6 @@
 	</node>
 
 	<node pkg="aruco_ros" type="marker_publisher" name="aruco_marker_publisher" output="screen">
-
 		<remap from="/image" to="/camera/color/image_raw"/>
 	</node>
 

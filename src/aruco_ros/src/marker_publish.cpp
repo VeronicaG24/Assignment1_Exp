@@ -50,6 +50,7 @@
 
 
 std::vector<int> my_marker_list;
+int mode = 0;
 
 class ArucoMarkerPublisher
 {
@@ -77,8 +78,6 @@ private:
   ros::Publisher ack_publisher;// = nh_.advertise<std_msgs::Bool>("/ack_camera", 10);
   ros::Publisher marker_point_publisher;// = nh_.advertise<geometry_msgs::Point>("/marker_point", 10);
   ros::Publisher pixel_side_publisher;// = nh_.advertise<std_msgs::Float64>("/pixel_side_marker", 10);
-
-
 
   image_transport::Publisher image_pub_;
   image_transport::Publisher debug_pub_;
@@ -110,9 +109,16 @@ public:
     	ack_msg.data=false;
     	camParam_ = aruco::CameraParameters();
     	
+    	// get list of the marker
     	if (!nh_.getParam("/marker_publisher/marker_list", my_marker_list)) {
     		ROS_ERROR("Impossibile ottenere il parametro '/marker_publisher/marker_list'");
     	}
+    	
+    	// get operating mode 0: camera fixed, 1: camera moving
+    	if (!nh_.getParam("/marker_publisher/mode", mode)) {
+    		ROS_ERROR("Impossibile ottenere il parametro '/marker_publisher/mode'");
+    	}
+    	
     ack_publisher = nh_.advertise<std_msgs::Bool>("/ack_camera", 10);
     marker_point_publisher = nh_.advertise<geometry_msgs::Point>("/marker_point", 10);
     pixel_side_publisher = nh_.advertise<std_msgs::Float64>("/pixel_side_marker", 10);
@@ -151,6 +157,7 @@ public:
           std::cout << markers_.at(i).id << " ";
           if (markers_.at(i).id == my_marker_list.at(0)) {
           	std::cout<<"Here\n";
+          	
           	// Imposta il valore booleano desiderato
     		ack_msg.data = true; 
 
@@ -175,6 +182,7 @@ public:
         	
           }
         }
+        
        std::cout << std::endl;
        
 
