@@ -27,8 +27,16 @@ from geometry_msgs.msg import Point
 from gazebo_msgs.msg import LinkState
 from std_msgs.msg import Int32
 
+pixel_limit = 170
+width_camera = 320
+lin_vel_move = 0.2
+ang_vel_move = 0.5
+no_vel_move = 0.0
+pixel_thr = 15
 
 class image_feature:
+
+
 
     def __init__(self, mode_param):
         '''Initialize ros publisher, ros subscriber'''
@@ -78,39 +86,39 @@ class image_feature:
                 print("MARKER TROVATO!")
 
                 # computer error
-                error = abs(self.marker_center_x - 320)
+                error = abs(self.marker_center_x - width_camera)
 
-                if self.current_pixel_side > 170:
-                    print("MARKER RAGGIUNTO: " + (self.marker_id))
+                if self.current_pixel_side > pixel_limit:
+                    print("MARKER RAGGIUNTO: " + str(self.marker_id))
                     cmd_vel = Twist()
-                    cmd_vel.linear.x = 0.0
-                    cmd_vel.angular.z = 0.0
+                    cmd_vel.linear.x = no_vel_move
+                    cmd_vel.angular.z = no_vel_move
                     self.vel_pub.publish(cmd_vel)
 
                     self.marker_list.pop(0)  # levo il primo elemento della lista così passo alla ricerca del marker successivo
 
-                elif error < 15:
+                elif error < pixel_thr:
                     print("ALLINEATOOOOOOOOOOO!")
 
                     cmd_vel = Twist()
-                    cmd_vel.linear.x = 0.4  # self.Kl * error
-                    cmd_vel.angular.z = 0.0
+                    cmd_vel.linear.x = lin_vel_move #0.4  # self.Kl * error
+                    cmd_vel.angular.z = no_vel_move
                     self.vel_pub.publish(cmd_vel)
 
                 else:
                     cmd_vel = Twist()
                     # error = min(error, max_error)
-                    cmd_vel.linear.x = 0.2  # self.Kl * error
-                    if self.marker_center_x < 320:
-                        cmd_vel.angular.z = 0.2  # self.Ka * error
+                    cmd_vel.linear.x = lin_vel_move  # self.Kl * error
+                    if self.marker_center_x < width_camera:
+                        cmd_vel.angular.z = ang_vel_move  # self.Ka * error
                     else:
-                        cmd_vel.angular.z = -0.2  # -self.Ka * error
+                        cmd_vel.angular.z = -lin_vel_move  # -self.Ka * error
                     self.vel_pub.publish(cmd_vel)
 
             else:
                 cmd_vel = Twist()
-                cmd_vel.linear.x = 0.0
-                cmd_vel.angular.z = 0.5
+                cmd_vel.linear.x = no_vel_move
+                cmd_vel.angular.z = ang_vel_move #0.5
                 self.vel_pub.publish(cmd_vel)
 
     def id_callback(self, data):
