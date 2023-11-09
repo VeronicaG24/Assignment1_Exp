@@ -3,15 +3,15 @@
     <include file="$(find rosbot_gazebo)/launch/rosbot_world.launch"></include>
     <include file="$(find rosbot_bringup)/launch/rosbot_gazebo.launch"></include>
 
-    <node pkg="rosbot_bringup" type="camera.py" name="camera" output="screen">
+    <node pkg="rosbot_bringup" type="camera.py" name="camera" output="screen" launch-prefix="xterm -e">
     </node>
 
-    <node pkg="aruco_ros" type="marker_publisher" name="aruco_marker_publisher" output="screen">
+    <node pkg="aruco_ros" type="marker_publisher" name="aruco_marker_publisher" output="screen" launch-prefix="xterm -e">
         <remap from="/image" to="/camera/color/image_raw"/>
     </node>
 
     <!-- Aggiungi questo nodo per image_view -->
-    <node name="image_view" pkg="image_view" type="image_view" args="image:=/aruco_marker_publisher/result" output="screen"/>
+    <node name="image_view" pkg="image_view" type="image_view" args="image:=/aruco_marker_publisher/result" output="screen" launch-prefix="xterm -e"/>
 
 </launch>
 

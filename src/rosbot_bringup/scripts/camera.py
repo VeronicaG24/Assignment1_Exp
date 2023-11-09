@@ -66,11 +66,6 @@ class image_feature:
         self.Kl = 0.015
         self.Ka = 4.0
         
-        
-
-        
-
-    
 
     def move_callback(self, ros_data):
          # controllo se la lista è vuota e se cos' fosse il programma finisce ( o così dovrebbe fare)
@@ -122,13 +117,6 @@ class image_feature:
                  cmd_vel.linear.x = 0.0
                  cmd_vel.angular.z = 0.5
                  self.vel_pub.publish(cmd_vel)
-             
-        
-         
-         
-         
-         
-         
     
     
     def id_callback(self, data):
