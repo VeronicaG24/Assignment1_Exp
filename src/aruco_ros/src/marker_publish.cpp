@@ -172,7 +172,7 @@ public:
       }
       if (!marker_detect.size()){
         ROS_INFO("Shotdown requested");
-        ros::shotdown();
+        ros::shutdown();
       }
 
     }
