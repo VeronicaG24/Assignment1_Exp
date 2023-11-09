@@ -35,9 +35,6 @@ no_vel_move = 0.0
 pixel_thr = 15
 
 class image_feature:
-
-
-
     def __init__(self, mode_param):
         '''Initialize ros publisher, ros subscriber'''
         rospy.init_node('image_feature', anonymous=True)
@@ -73,7 +70,6 @@ class image_feature:
         self.mode = mode_param
 
     def move_callback(self, ros_data):
-
         # controllo se la lista è vuota e se cos' fosse il programma finisce ( o così dovrebbe fare)
         if not self.marker_list:
             # invia messaggio per chiudere marker_publisher sul topic dove scriviamo il numero del marker
@@ -82,7 +78,6 @@ class image_feature:
 
         if self.mode == 0:
             if self.marker_id == self.marker_list[0]:
-
                 print("MARKER TROVATO!")
 
                 # computer error
@@ -96,6 +91,8 @@ class image_feature:
                     self.vel_pub.publish(cmd_vel)
 
                     self.marker_list.pop(0)  # levo il primo elemento della lista così passo alla ricerca del marker successivo
+                    rospy.set_param('/marker_publisher/marker_list', self.marker_list)
+
 
                 elif error < pixel_thr:
                     print("ALLINEATOOOOOOOOOOO!")
@@ -121,6 +118,54 @@ class image_feature:
                 cmd_vel.angular.z = ang_vel_move #0.5
                 self.vel_pub.publish(cmd_vel)
 
+        elif self.mode == 1:
+            if self.marker_id == self.marker_list[0]:
+                print("MARKER TROVATO!")
+
+                # Calcola l'errore in pixel per l'allineamento
+                error = abs(self.marker_center_x - width_camera)
+
+                if error < pixel_thr:
+                    print("TELECAMERA ALLINEATAAAAAAA!")
+                    # Fermo la rotazione della telecamera
+                    vel_camera = Float64()
+                    vel_camera.data = no_vel_move
+                    self.joint_state_pub.publish(vel_camera)
+                    orientation_robot = Pose()
+                    orientation_robot = (pose[9].orientation.x, pose[9].orientation.y, pose[9].orientation.w)
+                    orientation_camera = Pose()
+                    orientation_camera = (pose[10].orientation.x, pose[10].orientation.y, pose[10].orientation.w)
+                    orientation_diff = abs(orientation_camera - orientation_robot)
+                    if orientation_diff < 0.05
+                        # Devo mettere un controllo per verificare se il robot è allineato con la telecamera
+                        vel_camera = Float64()
+                        cmd_vel = Twst()
+                        cmd_vel.linear.x = lin_vel_move
+                        # TO FIX THE MOVEMENT WITH CONTROLLER ALE
+                        cmd_vel.angular.z = no_vel_move
+                        vel_camera.data = no_vel_move
+                        self.vel_pub.publish(cmd_vel)
+                        self.joint_state_pub.publish(vel_camera)
+                        
+                    self.marker_list.pop(0)  # Rimuovi il marker dalla lista per passare al successivo
+                    else:
+		        # Calcola la velocità angolare per l'allineamento
+		        vel_camera = Float64()
+		        cmd_vel = Twst()
+		        cmd_vel.angular.z = ang_vel_move
+		        vel_camera.data = -ang_vel_move
+		        self.vel_pub.publish(cmd_vel)
+		        self.joint_state_pub.publish(vel_camera)
+		        #vel_camera.data = ang_vel_move if self.marker_center_x < width_camera else -ang_vel_move
+		 else:
+		     vel_camera = Float64()
+                     vel_camera.data = ang_vel_move
+                     self.joint_state_pub.publish(vel_camera)
+            else:
+                vel_camera = Float64()
+                vel_camera.data = ang_vel_move
+                self.joint_state_pub.publish(vel_camera)
+
     def id_callback(self, data):
         self.marker_id = data.data
 
@@ -134,7 +179,6 @@ class image_feature:
     def pixel_callback(self, data):
         self.current_pixel_side = data.data
         print("PIXEL: ", self.current_pixel_side)
-
 
 def main(args):
     '''Initializes and cleanup ros node'''
@@ -156,7 +200,6 @@ def main(args):
     except KeyboardInterrupt:
         print("Shutting down ROS Image feature detector module")
     cv2.destroyAllWindows()
-
 
 if __name__ == '__main__':
     main(sys.argv)

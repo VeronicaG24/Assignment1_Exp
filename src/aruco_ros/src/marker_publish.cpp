@@ -65,6 +65,7 @@ private:
   // node params
   double marker_size_;
   bool useCamInfo_;
+  std::vector<int> marker_detect;
 
   // ROS pub-sub
   ros::NodeHandle nh_;
@@ -103,6 +104,10 @@ public:
   {
     bool publishImage = image_pub_.getNumSubscribers() > 0;
     bool publishDebug = debug_pub_.getNumSubscribers() > 0;
+
+    if(!nh_.getParam("/marker_publisher/marker_list", marker_detect)){
+      ROS_ERROR("Impossibile ottenere il parametro '/marker_publisher/marker_list'");
+    }
 
     ros::Time curr_stamp = msg->header.stamp;
     cv_bridge::CvImagePtr cv_ptr;
@@ -164,6 +169,10 @@ public:
         debug_msg.encoding = sensor_msgs::image_encodings::MONO8;
         debug_msg.image = mDetector_.getThresholdedImage();
         debug_pub_.publish(debug_msg.toImageMsg());
+      }
+      if (!marker_detect.size()){
+        ROS_INFO("Shotdown requested");
+        ros::shotdown();
       }
 
     }
