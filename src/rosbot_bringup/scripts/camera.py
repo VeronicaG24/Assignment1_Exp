@@ -28,8 +28,6 @@ from gazebo_msgs.msg import LinkState
 from std_msgs.msg import Int32
 
 
-
-
 class image_feature:
 
     def __init__(self):
@@ -47,7 +45,6 @@ class image_feature:
         
         self.subscriber = rospy.Subscriber("/id_publisher", Int32, self.id_callback, queue_size=1)
 
-        
         self.subscriber_ack = rospy.Subscriber("/ack_camera", Bool, self.ack_callback, queue_size=1)
 
         # Subscriber for the marker center
@@ -55,7 +52,7 @@ class image_feature:
 
         self.pixel_side_sub = rospy.Subscriber("/pixel_side_marker", Float64, self.pixel_callback, queue_size=1)
 
-        self.marker_list = [11, 12, 13, 15]
+        self.marker_list = rospy.get_param('/marker_publisher/marker_list')
         self.marker_center_x = 0.0
         self.marker_center_y = 0.0
         self.marker_id = 0
