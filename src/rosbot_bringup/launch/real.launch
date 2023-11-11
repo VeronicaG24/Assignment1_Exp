@@ -8,6 +8,10 @@
     <node pkg="aruco_ros" type="marker_publisher" name="aruco_marker_publisher" output="screen" launch-prefix="xterm -e">
         <remap from="/image" to="/camera/color/image_raw"/>
     </node>
+    
+    <node pkg="image_view" type="image_view" name="image_view" output="screen">
+        <remap from="image" to="/aruco_marker_publisher/result"/>
+    </node>
 
 </launch>
 

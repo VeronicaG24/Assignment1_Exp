@@ -10,6 +10,7 @@ from scipy.ndimage import filters
 import math
 
 import imutils
+from tf import transformations
 
 # OpenCV
 import cv2
@@ -34,7 +35,8 @@ width_camera = 320 # dimension of the camera
 lin_vel_move = 0.2 # linear velocity
 ang_vel_move = 0.5 # angular velocity
 no_vel_move = 0.0 # stop velocity
-pixel_thr = 15 # threshold in pixels for allignment 
+pixel_thr = 18 # threshold in pixels for allignment 
+yaw_thr = math.pi / 90  # +/- 2 degree allowed
 
 # Class for image features
 class image_feature:
@@ -81,6 +83,15 @@ class image_feature:
         # Control gains
         self.Kl = 0.015
         self.Ka = 4.0
+        self.kp_d = 0.2
+        self.kp_a = 3.0
+        self.ub_d = 0.3
+        self.ub_cr = 0.4 #upper bound camera rotation
+        self.ub_br = 0.5 #upper bound base rotation
+        
+        self.yaw_robot = 0.0
+        self.yaw_camera = 0.0
+        
         
         # Operating mode (0 for fixed camera, 1 for mobile camera)
         self.mode = mode_param
@@ -89,8 +100,31 @@ class image_feature:
         
     def pose_callback(self, data):
         # Extract orientation information from robot and camera
-        self.orientation_robot = (data.pose[9].orientation.x, data.pose[9].orientation.y, data.pose[9].orientation.w)
-        self.orientation_camera = (data.pose[10].orientation.x, data.pose[10].orientation.y, data.pose[10].orientation.w)
+        self.orientation_robot = (data.pose[9].orientation.x, data.pose[9].orientation.y, data.pose[9].orientation.z, data.pose[9].orientation.w)
+        self.orientation_camera = (data.pose[10].orientation.x, data.pose[10].orientation.y, data.pose[10].orientation.z, data.pose[10].orientation.w)
+        
+       
+        quaternion_robot = (
+               self.orientation_robot[0],
+               self.orientation_robot[1],
+               self.orientation_robot[2],
+               self.orientation_robot[3])
+               
+        euler_robot = transformations.euler_from_quaternion(quaternion_robot)
+           
+        self.yaw_robot = euler_robot[2]
+       # print("YAW ROBOT", self.yaw_robot)
+           
+        quaternion_camera = (
+               self.orientation_camera[0],
+               self.orientation_camera[1],
+               self.orientation_camera[2],
+               self.orientation_camera[3])
+               
+        euler_camera = transformations.euler_from_quaternion(quaternion_camera)
+           
+        self.yaw_camera = euler_camera[2]
+       # print("YAW CAMERA", self.yaw_camera)
 
     def move_callback(self, ros_data):
         # Check if the marker list is empty
@@ -128,13 +162,20 @@ class image_feature:
                     self.vel_pub.publish(cmd_vel)
 
                 else:
-                    # allign the robot with the center of the marker
+                    # CONTROLLER for robot's alignment with marker
                     cmd_vel = Twist()
-                    cmd_vel.linear.x = lin_vel_move
+                    cmd_vel.linear.x = self.kp_d * error
+                    if cmd_vel.linear.x > self.ub_d:
+                        cmd_vel.linear.x = self.ub_d
+                   
                     if self.marker_center_x < width_camera:
-                        cmd_vel.angular.z = ang_vel_move
+                        cmd_vel.angular.z = self.kp_a * error
+                        if cmd_vel.angular.z > self.ub_d:
+                            cmd_vel.angular.z = self.ub_d
                     else:
-                        cmd_vel.angular.z = -lin_vel_move
+                        cmd_vel.angular.z = - self.kp_a * error
+                        if cmd_vel.angular.z < - self.ub_d:
+                            cmd_vel.angular.z = - self.ub_d
                     
                     self.vel_pub.publish(cmd_vel)
 
@@ -146,58 +187,109 @@ class image_feature:
                 self.vel_pub.publish(cmd_vel)
 
         elif self.mode == 1:
-            # operation mode: camera fixed 
+        
+           # operation mode: camera moving 
             if self.marker_id == self.marker_list[0]:
-                error = abs(self.marker_center_x - width_camera)
+            
+                print("MARKER FOUND: " + str(self.marker_id))
+                
+                yaw_error = self.normalize_angle(self.yaw_camera - self.yaw_robot)
 
-                if error < pixel_thr:
-                    self.allineato = True
-                    print("I AM HERE! if ERROR")
+                error = abs(self.marker_center_x - width_camera)
+                
+               
+
+                if abs(yaw_error) <= yaw_thr or self.allineato == True:
+                    # robot alligned with the center of the marker
+                    print("ALLINEATOOOOOOOOOOOOOOOOOOO!")
+                    print("YAWWWWWW: ", yaw_error)
+                    print("ABSSSS: ", abs(yaw_error))
+                    
+                    
                     vel_camera = Float64()
-                    vel_camera.data = no_vel_move
+                    
+                    vel_camera.data = 0.0
                     self.joint_state_pub.publish(vel_camera)
                     
-                    orientation_diff_x = abs(self.orientation_camera[0] - self.orientation_robot[0])
-                    orientation_diff_y = abs(self.orientation_camera[1] - self.orientation_robot[1])
-                    orientation_diff_w = abs(self.orientation_camera[2] - self.orientation_robot[2])
+                    self.allineato = True
                     
-                    if orientation_diff_x < 0.05 and orientation_diff_y < 0.05 and orientation_diff_w < 0.5:
-                        print("ROBOT ALIGNED!")
-                        print(orientation_diff_x)
-                        print(orientation_diff_y)
-                        print(orientation_diff_w)
-                        vel_camera = Float64()
+                    if self.current_pixel_side > pixel_limit and self.allineato == True:
+                        # stop the robot when the marker is reached
+                        print("MARKER REACHED: " + str(self.marker_id))
+                        cmd_vel = Twist()
+                        cmd_vel.linear.x = no_vel_move
+                        cmd_vel.angular.z = no_vel_move
+                        self.vel_pub.publish(cmd_vel)
+
+                        # Remove the first element from the list to move to the next marker
+                        self.marker_list.pop(0)
+                        rospy.set_param('/marker_publisher/marker_list', self.marker_list)
+                        self.allineato = False
+
+                    elif error < pixel_thr and self.allineato == True:
+                        # robot alligned with the center of the marker
+                        print("robot and marker ALIGNED!")
                         cmd_vel = Twist()
                         cmd_vel.linear.x = lin_vel_move
                         cmd_vel.angular.z = no_vel_move
-                        vel_camera.data = no_vel_move
                         self.vel_pub.publish(cmd_vel)
-                        self.joint_state_pub.publish(vel_camera)
-                        allineato = False
-                        
-                    else:
-                        vel_camera = Float64()
-                        cmd_vel = Twist()
-                        print("I NEED TO ALIGN THE ROBOT!")
-                        print(orientation_diff_x)
-                        print(orientation_diff_y)
-                        print(orientation_diff_w)
-                        cmd_vel.angular.z = ang_vel_move
-                        vel_camera.data = -ang_vel_move
-                        self.vel_pub.publish(cmd_vel)
-                        self.joint_state_pub.publish(vel_camera)
-                else:
-                    vel_camera = Float64()
-                    print("I AM HERE! else ERROR")
-                    vel_camera.data = ang_vel_move
-                    self.joint_state_pub.publish(vel_camera)
-            else:
-                if self.allineato == False:
-                    vel_camera = Float64()
-                    print("I AM HERE! else MARKER")
-                    vel_camera.data = ang_vel_move
-                    self.joint_state_pub.publish(vel_camera)
 
+                    else:
+                        if self.allineato:
+                            print("QQQQQQQQQQQQQQQQQQQQQQQQQQQ")
+                            # CONTROLLER for robot's alignment with marker
+                            cmd_vel = Twist()
+                            cmd_vel.linear.x = self.kp_d * error
+                            if cmd_vel.linear.x > self.ub_d:
+                                cmd_vel.linear.x = self.ub_d
+                           
+                            if self.marker_center_x < width_camera:
+                                cmd_vel.angular.z = self.kp_a * error
+                                if cmd_vel.angular.z > self.ub_d:
+                                    cmd_vel.angular.z = self.ub_d
+                            else:
+                                cmd_vel.angular.z = - self.kp_a * error
+                                if cmd_vel.angular.z < - self.ub_d:
+                                    cmd_vel.angular.z = - self.ub_d
+                            
+                            self.vel_pub.publish(cmd_vel)
+                    
+
+                else:
+                   # if not self.allineato:
+                    # allign the robot with camera
+                    cmd_vel = Twist()
+                    cmd_vel.linear.x = 0.0
+                    #if self.marker_center_x < width_camera:
+                    cmd_vel.angular.z = self.kp_a * abs(yaw_error)#0.50
+                    if cmd_vel.angular.z > self.ub_br:
+                        cmd_vel.angular.z = self.ub_br
+                            
+                    self.vel_pub.publish(cmd_vel)
+                            
+                    vel_camera = Float64()
+                    vel_camera.data =  - self.kp_a * abs(yaw_error) + 0.1 #-0.40
+                    if vel_camera.data < - self.ub_cr:
+                        vel_camera.data = - self.ub_cr
+                    self.joint_state_pub.publish(vel_camera)
+                    #else:
+                     #   print("PORCODIO")
+
+              
+            else:
+                
+                vel_camera = Float64()
+                print("CAMERA SEARCHING FOR MARKER...")
+                vel_camera.data = ang_vel_move
+                self.joint_state_pub.publish(vel_camera)
+           
+           
+    
+    def normalize_angle(self, angle):
+        if math.fabs(angle) > math.pi:
+            angle = angle - (2 * math.pi * angle) / math.fabs(angle)
+        return angle
+    
     def id_callback(self, data):
         # Callback function for marker ID
         self.marker_id = data.data
