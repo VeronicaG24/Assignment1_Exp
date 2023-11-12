@@ -1,134 +1,71 @@
-# rosbot_ros #
+First assignment of Experimental robotics
+================================
+**Simone Borelli s4662264** <br>
+**Veronica Gavagna s5487110** <br>
+**Alessio Mura s4861320** <br>
+**Massimo Carlini s4678445** <br>
 
-ROS packages for ROSbot 2.0 and ROSbot 2.0 Pro.
+The purpose of the first assignment of Experimental robotics is to implement the control of a robot in **ROS** or **ROS 2**, initially in the **Gazebo** environment and subsequently with a real Rosbot, to reach 4 markers with the following IDs: 11, 12, 13, and 15.
+The IDs of the markers have specific meanings: 
 
-Demonstrations of **docker-compose** configurations are shown in [rosbot-docker](https://github.com/husarion/rosbot-docker/tree/ros1/demo) repo.
-It presents how to run an autonomous mapping and navigation demo with ROSbot and Navigation2 stack.
+* Marker 11 instructs the robot to rotate until it locates marker 12, then reaches it; 
+* Marker 12 instructs the robot to rotate until it finds marker 13, then reaches it; 
+* Marker 13 instructs the robot to rotate until it finds marker 15, then reaches it; 
+* Once marker 15 is found, the robot stops as it has completed its tasks. 
 
-# Quick start (simulation) #
+In any case the marker detection can be considered complete when the center of the camera aligns with the center of the marker and, before moving on to the next search, the robot's camera must detect at least 170 pixels on one side of a marker. To achieve this, two ROS nodes have been developed: 
 
-## Installation ##
+* The first is located within the **aruco_ros** package, named **marker_publisher**. This C++ node utilizes the [ArUco](http://wiki.ros.org/aruco) and [OpenCV](http://wiki.ros.org/opencv_apps) libraries to enable the camera for marker ID detection and publishes the first detected ID on the topic **/id_publisher**;
+* The second node, written in Python, is part of the **rosbot_bringup** package and is named **realworld**. This node handles the control aspect of the robot to reach the predefined marker.
 
-We assume that you are working on Ubuntu 16.04 and already have installed ROS Kinetic. If not, follow the [ROS install guide](http://wiki.ros.org/kinetic/Installation/Ubuntu)
+It is important to underline that, with the above-mentioned implementation, only the robot's control part is managed, not that of the camera. In other words, the camera, being fixed, rotates only when the robot rotates. To implement control of the camera as well, which is an optional task for the assignment, an additional node has been created: 
 
-Prepare the repository:
-```bash
-cd ~
-mkdir ros_workspace
-mkdir ros_workspace/src
-cd ~/ros_workspace/src
-catkin_init_workspace
-cd ~/ros_workspace
-catkin_make
-```
+* The **simulation** python node, which is also part of the **rosbot_bringup** package. Additionally, it handles the rotation of the camera using a specific control topic, **/robot_exp/camera_velocity_controller/command**, and utilizes Euler angles control to align the camera with the robot when the marker is detected.
 
-Above commands should execute without any warnings or errors.
+In addition to this, some modifications have been made to the **rosbot_gazebo.launch**, **rosbot_xacro**, and the addition of a **joint_state_controller** file to include, respectively, the plugins, hardware interface, and PID parameter values to enable camera control.
 
-Clone this repository to your workspace:
+Installing and running
+----------------------
+For start the whole program, you have to do some several, but fundamental, step. First of all it is important to have **ROS noetic** version on your pc; the best simple suggestion is to have the [**Docker**](https://docs.docker.com/get-docker/) and then follow this [**ROS guide**](http://wiki.ros.org/ROS/Installation). In addition it is required to install **xterm** terminal; you can do that by using the command ```sudo apt-get install xterm``` on your docker terminal. 
 
-```bash
-cd ~/ros_workspace/src
-git clone https://github.com/husarion/rosbot_ros.git -b noetic
-```
+You can clone our repository, by clicking on the terminal
 
-Install dependencies:
+```https://github.com/VeronicaG24/Assignment1_Exp```
 
-```bash
-cd ~/ros_workspace
-rosdep install --from-paths src --ignore-src -r -y
-```
+Make sure to execute the above command within the **src** folder of your workspace. Then execute ```catkin_make``` inside the root of your workspace for building our package. <br>
+Once you have done that, you must choose whether you want to launch the simulation with the robot having a fixed camera, meaning it only rotates in conjunction with the robot's movement, or if you want to launch the one with the camera that moves thanks to a continuous joint, i.e., a rotational joint without rotation limits. 
+For the first case, launch the following command from the terminal:
 
-Build the workspace:
+```roslaunch rosbot_bringup camera_fixed.launch```
 
-```bash
-cd ~/ros_workspace
-catkin_make
-```
+For the second one, use this other command:
 
-From this moment you can use rosbot simulations. Please remember that each time, when you open new terminal window, you will need to load system variables:
+```roslaunch rosbot_bringup exp1.launch```
 
-```bash
-source ~/ros_workspace/devel/setup.sh
-```
+In any case, if everything works properly, you should visualize the **Gazebo** environment with the Rosbot and the markers, 2 windows that prints if the marker is reached and the id number, and the **/aruco_marker_publisher_result** which simply shows what the camera detects. 
 
-## Creating, saving and loading the Map with Gazebo ##
 
-Run the following commands below. Use the teleop to move the robot around to create an accurate and thorough map.
+<table><tr>
+  <td> <img src="/rosobot_simulation.png" alt="Drawing" style="width: 800px;"/> </td>
+  <td> <img src="./camera_window.png" alt="Drawing" style="width: 600px;"/> </td>
+</tr>
+<tr>
+   <td>Gazebo window</td>
+   <td>/aruco_publisher_result window</td>
+  </tr>
+</table>
 
-In Terminal 1, launch the Gazebo simulation:
+Flowchart 
+----------------------
 
-```bash
-roslaunch rosbot_description rosbot_rviz_gmapping.launch
-```
+Simulation videos
+----------------------
+You can see the videos of both simulations: the first one is related to the fix camera.
 
-In Terminal 2, start teleop and drive the ROSbot, observe in Rviz as the map is created:
 
-```bash
-roslaunch rosbot_navigation rosbot_teleop.launch
-```
+Real robot video
+----------------------
 
-When you are satisfied with created map, you can save it. Open new terminal and save the map to some given path: 
 
-```bash
-rosrun map_server map_saver -f ~/ros_workspace/src/rosbot_ros/src/rosbot_navigation/maps/test_map
-```
-
-Now to make saved map loading possible you have to close all previous terminals and run the following commands below. Once loaded, use rviz to set 2D Nav Goal and the robot will autonomously reach the indicated position
-
-In Terminal 1, launch the Gazebo simulation
-
-```bash
-roslaunch rosbot_description rosbot_rviz_amcl.launch
-```
-
->**Tip:**
->
->If you have any problems with laser scan it probably means that you don't have a dedicated graphic card (or lack appropriate drivers). If that's the case then you'll have to change couple of things in `/rosbot_description/urdf/rosbot_gazebo` file: <br><br>
->Find:   `<!-- If you cant't use your GPU comment RpLidar using GPU and uncomment RpLidar using CPU gazebo plugin. -->`
-next coment RpLidar using GPU using `<!-- -->` from `<gazebo>` to `</gazebo>` like below:
-> ```xml
-> <!-- gazebo reference="rplidar">
->   <sensor type="gpu_ray" name="head_rplidar_sensor">
->     <pose>0 0 0 0 0 0</pose>
->     <visualize>false</visualize>
->     <update_rate>40</update_rate>
->     <ray>
->       <scan>
->         <horizontal>
->           <samples>720</samples>
->           <resolution>1</resolution>
->           <min_angle>-3.14159265</min_angle>
->           <max_angle>3.14159265</max_angle>
->         </horizontal>
->       </scan>
->       <range>
->         <min>0.2</min>
->         <max>30.0</max>
->         <resolution>0.01</resolution>
->       </range>
->       <noise>
->         <type>gaussian</type>
->         <mean>0.0</mean>
->         <stddev>0.01</stddev>
->       </noise>
->     </ray>
->     <plugin name="gazebo_ros_head_rplidar_controller" 
->filename="libgazebo_ros_gpu_laser.so">
->      <topicName>/rosbot/laser/scan</topicName>
->       <frameName>rplidar</frameName>
->     </plugin>
->   </sensor>
-> </gazebo -->
->```
->
->Now uncomment RpLidar using CPU plugin removing `<!-- -->`.
->
->If you want to make your laser scan visible just change:
->```xml
-><visualize>false</visualize>
->```
->to:
->```xml
-><visualize>true</visualize>
->```
->in the same plug in.
+Possible improvments
+----------------------

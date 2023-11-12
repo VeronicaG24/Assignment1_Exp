@@ -5,7 +5,7 @@
     <include file="$(find rosbot_gazebo)/launch/rosbot_world.launch"></include>
     <include file="$(find rosbot_bringup)/launch/rosbot_gazebo.launch"></include>
 
-    <node pkg="rosbot_bringup" type="camera.py" name="camera" output="screen" launch-prefix="xterm -e">
+    <node pkg="rosbot_bringup" type="simulation.py" name="camera" output="screen" launch-prefix="xterm -e">
     </node>
 
     <node pkg="aruco_ros" type="marker_publisher" name="aruco_marker_publisher" output="screen" launch-prefix="xterm -e">
@@ -14,6 +14,7 @@
     
     <node pkg="image_view" type="image_view" name="image_view" output="screen">
         <remap from="image" to="/aruco_marker_publisher/result"/>
+        <param name="autosize" value="true"/>
     </node>
 
 </launch>
