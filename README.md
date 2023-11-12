@@ -44,11 +44,10 @@ For the second one, use this other command:
 
 In any case, if everything works properly, you should visualize the **Gazebo** environment with the Rosbot and the markers, 2 windows that prints if the marker is reached and the id number, and the **/aruco_marker_publisher_result** which simply shows what the camera detects. 
 
-<img src="./rosobot_simulation.png" alt="robot with camera and markers" width=500>
 
 <table><tr>
-  <td> <img src="/rosobot_simulation.pn alt="Drawing" style="width: 600px;"/> </td>
-  <td> <img src="./Rviz.png" alt="Drawing" style="width: 600px;"/> </td>
+  <td> <img src="/rosobot_simulation.png" alt="Drawing" style="width: 800px;"/> </td>
+  <td> <img src="./camera_window.png" alt="Drawing" style="width: 600px;"/> </td>
 </tr>
 <tr>
    <td>Gazebo window</td>
