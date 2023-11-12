@@ -61,10 +61,13 @@ Flowchart
 Simulation videos
 ----------------------
 You can see the videos of both simulations: the first one is related to the fix camera.
-<video width="320" height="240" controls>
-  <source src="/video/Camera_fixed.mp4" type="video/mp4">
-  Il tuo browser non supporta il tag video.
-</video>
+
+ <img source src="/video/camera_fixed.gif" alt="gif showing the bahaviour of the Rosbot" width=800>
+
+ Now you can see the same behaviour, but in this simulation the camera is rotating.
+
+ 
+ 
 
 
 
