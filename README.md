@@ -42,7 +42,7 @@ For the second one, use this other command:
 
 ```roslaunch rosbot_bringup exp1.launch```
 
-In any case, if everything works properly, you should visualize the **Gazebo** environment, the one in the image below.
+In any case, if everything works properly, you should visualize the **Gazebo** environment with the Rosbot and the markers, 2 windows that prints if the marker is reached and the id number, and the **/aruco_marker_publisher_result** which simply shows what the camera detects. 
 
 <img src="./rosobot_simulation.png" alt="robot with camera and markers" width=500>
 
