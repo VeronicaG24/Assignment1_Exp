@@ -77,5 +77,5 @@ Real robot video
 ----------------------
 
 
-Possible improvments
+Possible improvements
 ----------------------
