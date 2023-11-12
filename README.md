@@ -64,7 +64,9 @@ You can see the videos of both simulations: the first one is related to the fix 
 
  <img source src="/video/camera_fixed.gif" alt="gif showing the bahaviour of the Rosbot" width=800>
 
- Now you can see the same behaviour, but in this simulation the camera is rotating.
+ 
+ 
+ The second one shows the rotation of the camera.
 
  
  
