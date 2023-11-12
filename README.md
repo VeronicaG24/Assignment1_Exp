@@ -15,30 +15,47 @@ The IDs of the markers have specific meanings:
 
 In any case the marker detection can be considered complete when the center of the camera aligns with the center of the marker and, before moving on to the next search, the robot's camera must detect at least 170 pixels on one side of a marker. To achieve this, two ROS nodes have been developed: 
 
-* The first is located within the **aruco_ros** package, named **marker_publisher**. This C++ node utilizes the **ArUco and **OpenCV** libraries to enable the camera for marker ID detection and publishes the first detected ID on the topic "/id_publisher;
+* The first is located within the **aruco_ros** package, named **marker_publisher**. This C++ node utilizes the **ArUco and **OpenCV** libraries to enable the camera for marker ID detection and publishes the first detected ID on the topic **/id_publisher**;
 * The second node, written in Python, is part of the **rosbot_bringup** package and is named **realworld**. This node handles the control aspect of the robot to reach the predefined marker.
 
-It is important to underline that, with the above-mentioned implementation, only the robot's control part is managed, not that of the camera. In other words, the camera, being fixed, rotates only when the robot rotates. To implement control of the camera as well, an additional node has been created: 
+It is important to underline that, with the above-mentioned implementation, only the robot's control part is managed, not that of the camera. In other words, the camera, being fixed, rotates only when the robot rotates. To implement control of the camera as well, which is an optional task for the assignment, an additional node has been created: 
 
 * The **simulation** python node, which is also part of the **rosbot_bringup** package. Additionally, it handles the rotation of the camera using a specific control topic, **/robot_exp/camera_velocity_controller/command**, and utilizes Euler angles control to align the camera with the robot when the marker is detected.
 
+In addition to this, some modifications have been made to the **rosbot_gazebo.launch**, **rosbot_xacro**, and the addition of a **joint_state_controller** file to include, respectively, the plugins, hardware interface, and PID parameter values to enable camera control.
+
 Installing and running
 ----------------------
-For start the whole program, you have to do some several, but fundamental, step. First of all it is important to have **ROS noetic** version on your pc; the best simple suggestion is to have the [**Docker**](https://docs.docker.com/get-docker/) and then follow this [**ROS guide**](http://wiki.ros.org/ROS/Installation). In addition it is required to install **xterm** terminal; you can do that by using the command ```apt-get install xterm``` on your docker terminal. 
+For start the whole program, you have to do some several, but fundamental, step. First of all it is important to have **ROS noetic** version on your pc; the best simple suggestion is to have the [**Docker**](https://docs.docker.com/get-docker/) and then follow this [**ROS guide**](http://wiki.ros.org/ROS/Installation). In addition it is required to install **xterm** terminal; you can do that by using the command ```sudo apt-get install xterm``` on your docker terminal. 
 
 You can clone our repository, and move it inside your **src** workspace folder, by clicking on the terminal
 
-```https://github.com/VeronicaG24/Assignment1_Exp/tree/fix```
+```https://github.com/VeronicaG24/Assignment1_Exp```
 
 Once you have done that, you must choose whether you want to launch the simulation with the robot having a fixed camera, meaning it only rotates in conjunction with the robot's movement, or if you want to launch the one with the camera that moves thanks to a continuous joint, i.e., a rotational joint without rotation limits. 
 For the first case, launch the following command from the terminal:
 
-```roslaunch Assignment1_Exp exp1.launch```
+```roslaunch rosbot_bringup camera_fixed.launch```
 
 For the second one, use this other command:
 
-```roslaunch Assignment1_Exp exp2.launch```
+```roslaunch rosbot_bringup exp1.launch```
 
-If everything works properly, you should the **Gazebo** environment, the one in the image below.
+In any case, if everything works properly, you should visualize the **Gazebo** environment, the one in the image below.
 
-<img src="./rosobot_simulation.png" alt="robot with camera and markers" width=400>
+<img src="./rosobot_simulation.png" alt="robot with camera and markers" width=500>
+
+Flowchart 
+----------------------
+
+Simulation videos
+----------------------
+You can see the videos of both simulations: the first one is related to the fix camera.
+
+
+Real robot video
+----------------------
+
+
+Possible Improvments
+----------------------
