@@ -46,8 +46,8 @@ In any case, if everything works properly, you should visualize the **Gazebo** e
 
 
 <table><tr>
-  <td> <img src="/rosobot_simulation.png" alt="Drawing" style="width: 800px;"/> </td>
-  <td> <img src="./camera_window.png" alt="Drawing" style="width: 600px;"/> </td>
+  <td> <img src="/rosobot_simulation.png" alt="Drawing" style="width: 850px;"/> </td>
+  <td> <img src="./camera_window.png" alt="Drawing" style="width: 350px;"/> </td>
 </tr>
 <tr>
    <td>Gazebo window</td>
