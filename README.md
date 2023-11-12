@@ -46,6 +46,16 @@ In any case, if everything works properly, you should visualize the **Gazebo** e
 
 <img src="./rosobot_simulation.png" alt="robot with camera and markers" width=500>
 
+<table><tr>
+  <td> <img src="/rosobot_simulation.pn alt="Drawing" style="width: 600px;"/> </td>
+  <td> <img src="./Rviz.png" alt="Drawing" style="width: 600px;"/> </td>
+</tr>
+<tr>
+   <td>Gazebo window</td>
+   <td>/aruco_publisher_result window</td>
+  </tr>
+</table>
+
 Flowchart 
 ----------------------
 
