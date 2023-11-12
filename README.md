@@ -62,13 +62,13 @@ Simulation videos
 ----------------------
 You can see the videos of both simulations: the first one is related to the fix camera.
 
- <img source src="/video/camera_fixed.gif" alt="gif showing the bahaviour of the Rosbot" width=800>
+ <img source src="/video/camera_fixed.gif" alt="gif showing the behaviour of the Rosbot with fixed camera" width=800>
 
  
  
  The second one shows the rotation of the camera.
 
- 
+ <img source src="/video/camera_moving.gif" alt="gif showing the bahaviour of the Rosbot with rotating camera" width=800>
  
 
 
