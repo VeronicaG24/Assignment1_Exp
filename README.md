@@ -30,7 +30,7 @@ For start the whole program, you have to do some several, but fundamental, step.
 
 You can clone our repository, and move it inside your **src** workspace folder, by clicking on the terminal
 
-```https://github.com/VeronicaG24/Assignment1_Exp/tree/fix```
+```https://github.com/VeronicaG24/Assignment1_Exp```
 
 Once you have done that, you must choose whether you want to launch the simulation with the robot having a fixed camera, meaning it only rotates in conjunction with the robot's movement, or if you want to launch the one with the camera that moves thanks to a continuous joint, i.e., a rotational joint without rotation limits. 
 For the first case, launch the following command from the terminal:
