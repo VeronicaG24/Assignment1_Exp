@@ -39,4 +39,6 @@ For the second one, use this other command:
 
 ```roslaunch Assignment1_Exp exp2.launch```
 
-If everything works properly, you should the **Gazebo** environment.
+If everything works properly, you should the **Gazebo** environment, the one in the image below.
+
+<img src="./rt_firstassignment/image_rsass.png" alt="blocks gold and silver paired" width=400>
