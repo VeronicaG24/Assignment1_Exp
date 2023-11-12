@@ -35,15 +35,15 @@ You can clone our repository, and move it inside your **src** workspace folder, 
 Once you have done that, you must choose whether you want to launch the simulation with the robot having a fixed camera, meaning it only rotates in conjunction with the robot's movement, or if you want to launch the one with the camera that moves thanks to a continuous joint, i.e., a rotational joint without rotation limits. 
 For the first case, launch the following command from the terminal:
 
-```roslaunch Assignment1_Exp exp1.launch```
+```roslaunch rosbot_bringup camera_fixed.launch```
 
 For the second one, use this other command:
 
-```roslaunch Assignment1_Exp exp2.launch```
+```roslaunch rosbot_bringup exp1.launch```
 
 If everything works properly, you should the **Gazebo** environment, the one in the image below.
 
-<img src="./rosobot_simulation.png" alt="robot with camera and markers" width=400>
+<img src="./rosobot_simulation.png" alt="robot with camera and markers" width=500>
 
 Flowchart 
 ----------------------
