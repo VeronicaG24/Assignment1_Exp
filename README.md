@@ -41,4 +41,4 @@ For the second one, use this other command:
 
 If everything works properly, you should the **Gazebo** environment, the one in the image below.
 
-<img src="./rosbot_simulation.png" alt="blocks gold and silver paired" width=400>
+<img src="./rosobot_simulation.png" alt="robot with camera and markers" width=400>
