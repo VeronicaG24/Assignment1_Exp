@@ -61,6 +61,11 @@ Flowchart
 Simulation videos
 ----------------------
 You can see the videos of both simulations: the first one is related to the fix camera.
+<video width="320" height="240" controls>
+  <source src="/video/Camera_fixed.mp4" type="video/mp4">
+  Il tuo browser non supporta il tag video.
+</video>
+
 
 
 Real robot video
