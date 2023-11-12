@@ -41,7 +41,7 @@ For the second one, use this other command:
 
 ```roslaunch rosbot_bringup exp1.launch```
 
-If everything works properly, you should the **Gazebo** environment, the one in the image below.
+In any case, if everything works properly, you should visualize the **Gazebo** environment, the one in the image below.
 
 <img src="./rosobot_simulation.png" alt="robot with camera and markers" width=500>
 
