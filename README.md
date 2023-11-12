@@ -28,10 +28,11 @@ Installing and running
 ----------------------
 For start the whole program, you have to do some several, but fundamental, step. First of all it is important to have **ROS noetic** version on your pc; the best simple suggestion is to have the [**Docker**](https://docs.docker.com/get-docker/) and then follow this [**ROS guide**](http://wiki.ros.org/ROS/Installation). In addition it is required to install **xterm** terminal; you can do that by using the command ```sudo apt-get install xterm``` on your docker terminal. 
 
-You can clone our repository, and move it inside your **src** workspace folder, by clicking on the terminal
+You can clone our repository, by clicking on the terminal
 
 ```https://github.com/VeronicaG24/Assignment1_Exp```
 
+Make sure to execute the above command within the **src** folder of your workspace. Then execute ```catkin_make``` inside the root of your workspace for building our package. <br>
 Once you have done that, you must choose whether you want to launch the simulation with the robot having a fixed camera, meaning it only rotates in conjunction with the robot's movement, or if you want to launch the one with the camera that moves thanks to a continuous joint, i.e., a rotational joint without rotation limits. 
 For the first case, launch the following command from the terminal:
 
