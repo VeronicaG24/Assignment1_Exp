@@ -122,7 +122,7 @@ Loop until keyboard interrupt
     if yes, then marker found
         Compute error between marker center and camera center
         if error is less than pixel threshold, robot is aligned
-            **Check if robot yaw is within threshold**
+            Check if robot yaw is within threshold
             if yes, set linear velocity to forward and angular velocity to zero
             else, rotate robot until yaw is within threshold
         else, if current pixel side is greater than pixel limit, marker is reached
