@@ -80,6 +80,25 @@ In any case, if everything works properly, you should visualize the **Gazebo** e
 Pseudocode 
 ----------------------
 
+The code for the first part where the camera is fixed is divided into separate functions as follow:
+
+* `main()`: manages the robot so that it will reach the goal of having silver and golden boxes paired.
+* `id_callback()`: callback function to get the ID of the marker detected by the camera.
+* `marker_center_callback()`: callback function to get the center of the detected marker.
+* `pixel_callback()`: callback function to get the number of the side of the target marker in pixel.
+
+Then, the following global variables are used:
+* `pixel_limit = 170`: limit for stopping the robot
+* `width_camera = 320`: dimension of the camera
+* `lin_vel_move = 0.2`: linear velocity
+* `ang_vel_move = 0.5`: angular velocity
+* `no_vel_move = 0.0`: stop velocity
+* `pixel_thr = 18`: threshold in pixels for alignment
+* `kp_d = 0.2`: control distance gain
+* `kp_a = 3.0`: control angular gain
+* `ub_d = 0.3`: upper bound distance
+
+
 ```python
 Initialize and clean up ROS node
 Create image_feature object
@@ -110,6 +129,8 @@ Loop until keyboard interrupt
 Update marker and parameters
 Destroy all windows
 ```
+
+
 
 ```python
 Initialize and clean up ROS node
