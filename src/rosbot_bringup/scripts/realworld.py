@@ -36,17 +36,16 @@ lin_vel_move = 0.2  # linear velocity
 ang_vel_move = 0.5  # angular velocity
 no_vel_move = 0.0  # stop velocity
 pixel_thr = 18  # threshold in pixels for alignment
-yaw_thr = math.pi / 90  # +/- 2 degree allowed
 
+# Controller's gains
 kp_d = 0.2  # control distance gain
 kp_a = 3.0  # control angular gain
 ub_d = 0.3  # upper bound distance
-ub_cr = 0.4  # upper bound camera rotation
-ub_br = 0.5  # upper bound base rotation
 
 
 # Class for image features
 class image_feature:
+
     def __init__(self):
         '''Initialize ROS publisher, ROS subscriber'''
         rospy.init_node('image_feature', anonymous=True)
@@ -63,12 +62,6 @@ class image_feature:
         # Subscriber for marker ID
         self.subscriber = rospy.Subscriber("/id_publisher", Int32, self.id_callback, queue_size=1)
 
-        # Subscriber for acknowledgment from the camera
-        self.subscriber_ack = rospy.Subscriber("/ack_camera", Bool, self.ack_callback, queue_size=1)
-
-        # Subscriber for robot/camera pose and orientation
-        self.subscriber_pose = rospy.Subscriber("/gazebo/link_states", LinkStates, self.pose_callback, queue_size=1)
-
         # Subscriber for the marker center
         self.marker_center_sub = rospy.Subscriber("/marker_point", Point, self.marker_center_callback, queue_size=1)
 
@@ -84,44 +77,6 @@ class image_feature:
         self.marker_id = 0  # marker id
         self.current_pixel_side = 0.0  # pixel side of the marker
 
-        self.orientation_robot = 0.0  # orientation of the robot
-        self.orientation_camera = 0.0  # orientation of the camera
-
-        self.yaw_robot = 0.0
-        self.yaw_camera = 0.0
-
-        self.alligned = False  # used to align the robot with the center of the marker
-
-    def pose_callback(self, data):
-        # Ensure that the 'pose' list is not empty
-        if len(data.pose) >= 10:
-            # Extract orientation information from the robot
-            self.orientation_robot = (
-                data.pose[9].orientation.x, data.pose[9].orientation.y, data.pose[9].orientation.z, data.pose[9].orientation.w)
-            quaternion_robot = (
-                self.orientation_robot[0],
-                self.orientation_robot[1],
-                self.orientation_robot[2],
-                self.orientation_robot[3])
-            # compute Euler transformation for the robot
-            euler_robot = transformations.euler_from_quaternion(quaternion_robot)
-            # get yaw of the robot
-            self.yaw_robot = euler_robot[2]
-
-            # Extract orientation information from the camera
-            self.orientation_camera = (
-                data.pose[10].orientation.x, data.pose[10].orientation.y, data.pose[10].orientation.z, data.pose[10].orientation.w)
-            quaternion_camera = (
-                self.orientation_camera[0],
-                self.orientation_camera[1],
-                self.orientation_camera[2],
-                self.orientation_camera[3])
-            # compute Euler transformation for the camera
-            euler_camera = transformations.euler_from_quaternion(quaternion_camera)
-            # get yaw of the camera
-            self.yaw_camera = euler_camera[2]
-
-
     def move_callback(self, ros_data):
         # Check if the marker list is empty
         if not self.marker_list:
@@ -134,7 +89,7 @@ class image_feature:
             print("MARKER FOUND!")
 
             # Compute error
-            self.error = abs(self.marker_center_x - width_camera)
+            self.error = abs(self.marker_center_x - width_camera) # Error between the marker's center and the camera's center
 
             if self.current_pixel_side > pixel_limit:
                 # stop the robot when the marker is reached
@@ -148,16 +103,15 @@ class image_feature:
                 self.marker_list.pop(0)
                 rospy.set_param('/marker_publisher/marker_list', self.marker_list)
 
-            elif self.error < pixel_thr:
-                # robot aligned with the center of the marker
-                print("ALIGNED!")
+            elif self.error < pixel_thr: # Check if the robot is aligned with the marker
+                print("ROBOT AND MARKER ALIGNED!")
                 cmd_vel = Twist()
                 cmd_vel.linear.x = lin_vel_move
                 cmd_vel.angular.z = no_vel_move
                 self.vel_pub.publish(cmd_vel)
 
             else:
-                # CONTROLLER for robot's alignment with marker
+                # CONTROLLER for robot's alignment with markers
                 cmd_vel = Twist()
                 cmd_vel.linear.x = kp_d * self.error
                 if cmd_vel.linear.x > ub_d:
@@ -176,26 +130,19 @@ class image_feature:
 
         else:
             # robot looking for the target marker
+            print("ROBOT SEARCHING FOR MARKER...")
             cmd_vel = Twist()
             cmd_vel.linear.x = no_vel_move
             cmd_vel.angular.z = ang_vel_move
             self.vel_pub.publish(cmd_vel)
 
-    def normalize_angle(self, angle):
-        if math.fabs(angle) > math.pi:
-            angle = angle - (2 * math.pi * angle) / math.fabs(angle)
-        return angle
 
     def id_callback(self, data):
         # Callback function for marker ID
         self.marker_id = data.data
 
-    def ack_callback(self, ack):
-        # Callback function for acknowledgment from the camera
-        self.ack_data = ack.data
-
     def marker_center_callback(self, data):
-        # Callback function for marker center
+        # Callback function for marker's center
         self.marker_center_x = data.x
         self.marker_center_y = data.y
 

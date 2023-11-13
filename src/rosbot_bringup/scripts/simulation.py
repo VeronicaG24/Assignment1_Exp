@@ -63,9 +63,6 @@ class image_feature:
         # Subscriber for marker ID
         self.subscriber = rospy.Subscriber("/id_publisher", Int32, self.id_callback, queue_size=1)
 
-        # Subscriber for acknowledgment from the camera
-        self.subscriber_ack = rospy.Subscriber("/ack_camera", Bool, self.ack_callback, queue_size=1)
-
         # Subscriber for robot/camera pose and orientation
         self.subscriber_pose = rospy.Subscriber("/gazebo/link_states", LinkStates, self.pose_callback, queue_size=1)
 
@@ -133,9 +130,9 @@ class image_feature:
 
             print("MARKER FOUND: " + str(self.marker_id))
 
-            self.yaw_error = self.normalize_angle(self.yaw_camera - self.yaw_robot)
+            self.yaw_error = self.normalize_angle(self.yaw_camera - self.yaw_robot) # Error between robot base's orientation and camera's orientation
 
-            self.error = abs(self.marker_center_x - width_camera)
+            self.error = abs(self.marker_center_x - width_camera) # Error between the marker's center and the camera's center
 
             if abs(self.yaw_error) <= yaw_thr or self.alligned == True:
                 # robot aligned with the center of the marker
@@ -191,7 +188,7 @@ class image_feature:
                 # allign the robot with camera
                 cmd_vel = Twist()
                 cmd_vel.linear.x = no_vel_move
-                cmd_vel.angular.z = kp_a * abs(self.yaw_error)  # 0.50
+                cmd_vel.angular.z = kp_a * abs(self.yaw_error)
 
                 if cmd_vel.angular.z > ub_br:
                     cmd_vel.angular.z = ub_br
@@ -199,7 +196,7 @@ class image_feature:
                 self.vel_pub.publish(cmd_vel)
 
                 vel_camera = Float64()
-                vel_camera.data = - kp_a * abs(self.yaw_error) + 0.1  # -0.40
+                vel_camera.data = - kp_a * abs(self.yaw_error) + 0.1 # + 0.1 is due to the fact that the camera's velocity has to be slower than robot base's velocity
                 if vel_camera.data < - ub_cr:
                     vel_camera.data = - ub_cr
                 self.joint_state_pub.publish(vel_camera)
@@ -219,10 +216,6 @@ class image_feature:
     def id_callback(self, data):
         # Callback function for marker ID
         self.marker_id = data.data
-
-    def ack_callback(self, ack):
-        # Callback function for acknowledgment from the camera
-        self.ack_data = ack.data
 
     def marker_center_callback(self, data):
         # Callback function for marker center

@@ -55,7 +55,6 @@ class ArucoMarkerPublisher {
 	  aruco::CameraParameters camParam_;
 	  
 	  // Message
-	  std_msgs::Bool ack_msg;
 	  geometry_msgs::Point marker_center;
 	  std_msgs::Float64 pixel_msg;
 	  std_msgs::Int32 marker_id_msg;
@@ -69,9 +68,7 @@ class ArucoMarkerPublisher {
 	  ros::NodeHandle nh_;
 	  image_transport::ImageTransport it_;
 	  image_transport::Subscriber image_sub_;
-	  
-	  // Publisher for acknowledgment
-	  ros::Publisher ack_publisher;
+	 
 	  // Publisher for marker point
 	  ros::Publisher marker_point_publisher;
 	  // Publisher for number of pixel of the side of the marker
@@ -99,7 +96,6 @@ class ArucoMarkerPublisher {
 		    camParam_ = aruco::CameraParameters();
 		    
 		    // Advertise publishers for marker-related messages
-		    ack_publisher = nh_.advertise<std_msgs::Bool>("/ack_camera", 10);
 		    marker_point_publisher = nh_.advertise<geometry_msgs::Point>("/marker_point", 10);
 		    pixel_side_publisher = nh_.advertise<std_msgs::Float64>("/pixel_side_marker", 10);
 		    id_pub = nh_.advertise<std_msgs::Int32>("/id_publisher", 10);
