@@ -53,11 +53,8 @@ class image_feature:
         # Topic where we publish velocity commands
         self.vel_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=1)
 
-        # Publisher for the JointState message
-        self.joint_state_pub = rospy.Publisher("/robot_exp/camera_velocity_controller/command", Float64, queue_size=1)
-
         # Subscriber for camera image
-        self.subscriber = rospy.Subscriber("/camera/color/image_raw/compressed", CompressedImage, self.move_callback, queue_size=1)
+        self.subscriber = rospy.Subscriber("/camera/rgb/image_raw/compressed", CompressedImage, self.move_callback, queue_size=1)
 
         # Subscriber for marker ID
         self.subscriber = rospy.Subscriber("/id_publisher", Int32, self.id_callback, queue_size=1)
