@@ -102,9 +102,9 @@ Then, the following global variables are used:
 
 ```python
 Initialize and clean up ROS node
-Create image_feature object
+Create image_feature class
 Compute the orientation data for camera and robot alignment
-Loop until keyboard interrupt
+Loop until keyboard interrupt or until goal is completed
     Check if marker list is empty
     if empty, shutdown node
     else, continue
@@ -158,8 +158,8 @@ Then, the following global variables are used:
 
 ```python
 Initialize and clean up ROS node
-Create image_feature object
-Loop until keyboard interrupt
+Create image_feature class
+Loop until keyboard interrupt or until goal is completed
     Check if marker list is empty
     if empty, shutdown node
     else, continue
