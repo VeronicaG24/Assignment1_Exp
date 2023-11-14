@@ -199,7 +199,7 @@ You can see the videos of both simulations: the first one is related to the fix 
 
 Real robot video
 ----------------------
-
+You can observe the behavior of the real robot, **ROSbot 2**, which is the same as in the simulation. The video in the small box represents what the camera sees.
 
 Possible improvements
 ----------------------
