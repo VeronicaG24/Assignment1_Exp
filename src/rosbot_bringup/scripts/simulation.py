@@ -209,6 +209,7 @@ class image_feature:
             self.joint_state_pub.publish(vel_camera)
 
     def normalize_angle(self, angle):
+        # function for normalizing angles
         if math.fabs(angle) > math.pi:
             angle = angle - (2 * math.pi * angle) / math.fabs(angle)
         return angle
