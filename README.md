@@ -83,9 +83,26 @@ Pseudocode
 The code for the first part where the camera is fixed is divided into separate functions as follow:
 
 * `main()`: manages the robot so that it will reach the goal of having silver and golden boxes paired.
+```python
+def main:
+  Initializes and cleans up ROS node
+  if some keyboard interrupt is received, shutdown ROS Image feature detector module
+```
 * `id_callback()`: callback function to get the ID of the marker detected by the camera.
+```python
+def id_callback:
+  Assign the data of callback to the marker_id variable
+```
 * `marker_center_callback()`: callback function to get the center of the detected marker.
+```python
+def maker_center_callback:
+  Assign the data of callback to the marker center variables
+```
 * `pixel_callback()`: callback function to get the number of the side of the target marker in pixel.
+```python
+def pixel_callback:
+  Assign the data to the current_pixel_side variable
+```
 * `move_callback()`: callback function to manage the movement of the robot (described in the pseudocode below).
 
 Then, the following global variables are used:
@@ -104,7 +121,7 @@ Then, the following global variables are used:
 Initialize and clean up ROS node
 Create image_feature class
 Compute the orientation data for camera and robot alignment
-Loop until keyboard interrupt or until goal is completed
+Loop until keyboard interrupt or until the task is completed
     Check if marker list is empty
     if empty, shutdown node
     else, continue
@@ -132,14 +149,45 @@ Destroy all windows
 ```
 
 The code for the second part where the camera is moving is divided into separate functions as follow:
-
 * `main()`: manages the robot so that it will reach the goal of having silver and golden boxes paired.
+```python
+def main:
+  Initializes and cleans up ROS node
+  if some keyboard interrupt is received, shutdown ROS Image feature detector module
+```
 * `id_callback()`: callback function to get the ID of the marker detected by the camera.
+```python
+def id_callback:
+  Assign the data of callback to the marker_id variable
+```
 * `marker_center_callback()`: callback function to get the center of the detected marker.
+```python
+def maker_center_callback:
+  Assign the data of callback to the marker center variables
+```
 * `pixel_callback()`: callback function to get the number of the side of the target marker in pixel.
+```python
+def pixel_callback:
+  Assign the data to the current_pixel_side variable
+```
 * `pose_callback()`: callback function to get the orientation of the robot and the orientation of the camera to compute the euler transformation and get the yaw.
+```python
+def pose_callback:
+  if 10 topics are instantiate
+    Assign the data of callback to the orientation_robot variable
+    compute the Euler transformation for the robot
+    get the yaw of the robot
+    Assign the data of callback to the orientation_camera variable
+    compute the Euler transformation for the robot
+    get the yaw of the robot
+```
 * `normalize_callback()`: function for normalizing angles.
+```python
+def normalize_callback:
+  keep the angle between -pi and pi 
+```
 * `move_callback()`: callback function to manage the movement of the robot and the camera (described in the pseudocode below).
+  
 
 Then, the following global variables are used:
 * `pixel_limit = 165`: limit for stopping the robot
@@ -159,7 +207,7 @@ Then, the following global variables are used:
 ```python
 Initialize and clean up ROS node
 Create image_feature class
-Loop until keyboard interrupt or until goal is completed
+Loop until keyboard interrupt or until the task is completed
     Check if marker list is empty
     if empty, shutdown node
     else, continue
