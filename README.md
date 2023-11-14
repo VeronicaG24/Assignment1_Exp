@@ -249,6 +249,8 @@ Real robot video
 ----------------------
 You can observe the behavior of the real robot, **ROSbot 2**, which is the same as in the simulation. The video in the small box represents what the camera sees.
 
+ <img source src="/video/rosbot_bihaviour.gif" alt="gif showing the bahaviour of a real Rosbot" width=800>
+
 Possible improvements
 ----------------------
 Here are some possible improvements:
