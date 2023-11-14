@@ -8,7 +8,7 @@ First assignment of Experimental robotics
 Requirements
 ----------------------
 
-The purpose of the first assignment of Experimental robotics is to implement the control of a robot in **ROS** or **ROS 2**, initially in the **Gazebo** environment and subsequently with a real Rosbot, to reach 4 markers with the following IDs: 11, 12, 13, and 15.
+The purpose of the first assignment of Experimental robotics is to implement the control of a robot in **ROS** or **ROS 2**, initially in the **Gazebo** environment and subsequently with a real **Rosbot**, to reach 4 markers with the following IDs: 11, 12, 13, and 15.
 
 The IDs of the markers have specific meanings: 
 
@@ -199,7 +199,7 @@ You can see the videos of both simulations: the first one is related to the fix 
 
 Real robot video
 ----------------------
-
+You can observe the behavior of the real robot, **ROSbot 2**, which is the same as in the simulation. The video in the small box represents what the camera sees.
 
 Possible improvements
 ----------------------
