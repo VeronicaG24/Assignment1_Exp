@@ -173,13 +173,13 @@ def pixel_callback:
 * `pose_callback()`: callback function to get the orientation of the robot and the orientation of the camera to compute the euler transformation and get the yaw.
 ```python
 def pose_callback:
-  if 10 topics are instantiate
+  if 10 topics are instantiated
     Assign the data of callback to the orientation_robot variable
     Compute the Euler transformation for the robot
     Get the yaw of the robot
     Assign the data of callback to the orientation_camera variable
-    Compute the Euler transformation for the robot
-    Get the yaw of the robot
+    Compute the Euler transformation for the camera
+    Get the yaw of the camera
 ```
 * `normalize_callback()`: function for normalizing angles.
 ```python
