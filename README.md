@@ -1,9 +1,9 @@
 First assignment of Experimental robotics
 ================================
 **Simone Borelli S4662264** <br>
+**Massimo Carlini S4678445** <br>
 **Veronica Gavagna S5487110** <br>
 **Alessio Mura S4861320** <br>
-**Massimo Carlini S4678445** <br>
 
 Requirements
 ----------------------
