@@ -184,7 +184,7 @@ def pose_callback:
 * `normalize_callback()`: function for normalizing angles.
 ```python
 def normalize_callback:
-  keep the angle between -pi and pi 
+  Keep the angle between -pi and pi 
 ```
 * `move_callback()`: callback function to manage the movement of the robot and the camera (described in the pseudocode below).
   
