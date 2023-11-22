@@ -175,11 +175,11 @@ def pixel_callback:
 def pose_callback:
   if 10 topics are instantiate
     Assign the data of callback to the orientation_robot variable
-    compute the Euler transformation for the robot
-    get the yaw of the robot
+    Compute the Euler transformation for the robot
+    Get the yaw of the robot
     Assign the data of callback to the orientation_camera variable
-    compute the Euler transformation for the robot
-    get the yaw of the robot
+    Compute the Euler transformation for the robot
+    Get the yaw of the robot
 ```
 * `normalize_callback()`: function for normalizing angles.
 ```python
@@ -249,7 +249,7 @@ Real robot video
 ----------------------
 You can observe the behavior of the real robot, **ROSbot 2**, which is the same as in the simulation. The video in the small box represents what the camera sees.
 
-The code used can be found on the same repository but in the `real_robot` branch. It is the same used in the simulation with the camera fixed without the part related o the simulation.
+The code used can be found on the same repository but in the `real_robot` branch. It is the same used in the simulation with the camera fixed without the part related to the simulation.
 
  <img source src="/video/rosbot_bihaviour.gif" alt="gif showing the bahaviour of a real Rosbot" width=800>
 
